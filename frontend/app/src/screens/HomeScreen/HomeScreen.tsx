@@ -28,7 +28,6 @@ import * as dn from "dnum";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { HomeTable } from "./HomeTable";
-import { YieldSourceTable } from "./YieldSourceTable";
 
 type ForkInfo = (typeof FORKS_INFO)[number];
 
