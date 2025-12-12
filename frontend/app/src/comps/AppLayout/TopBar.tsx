@@ -2,12 +2,13 @@
 
 import type { MenuItem } from "./Menu";
 
-import { Logo } from "@/src/comps/Logo/Logo";
+import logoName from "@/src/assets/logo-name.svg";
 import { Tag } from "@/src/comps/Tag/Tag";
 import { DEPLOYMENT_FLAVOR } from "@/src/env";
 import { useWhiteLabelHeader } from "@/src/hooks/useWhiteLabel";
 import { css } from "@/styled-system/css";
 import { IconBorrow, IconDashboard, IconEarn, IconLeverage, IconStake } from "@liquity2/uikit";
+import Image from "next/image";
 import Link from "next/link";
 import { AccountButton } from "./AccountButton";
 import { Menu } from "./Menu";
@@ -83,9 +84,17 @@ export function TopBar() {
             <div
               className={css({
                 flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                height: "100%",
               })}
             >
-              <Logo size={32} />
+              <Image
+                src={logoName}
+                alt={headerConfig.appName}
+                height={32}
+                style={{ height: "32px", width: "auto" }}
+              />
             </div>
             <div
               className={css({
@@ -102,7 +111,6 @@ export function TopBar() {
                 whiteSpace: "nowrap",
               })}
             >
-              <div>{headerConfig.appName}</div>
               {DEPLOYMENT_FLAVOR && (
                 <div
                   className={css({

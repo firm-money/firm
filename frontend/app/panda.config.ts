@@ -24,6 +24,9 @@ export default defineConfig({
               body: {
                 value: WHITE_LABEL_CONFIG.typography.fontFamily,
               },
+              heading: {
+                value: WHITE_LABEL_CONFIG.typography.headingFontFamily,
+              },
             },
           },
         },
@@ -46,10 +49,14 @@ export default defineConfig({
       fontWeight: 500,
       color: "content",
       background: "background",
+      fontFamily: "var(--font-work-sans), sans-serif",
     },
     html: {
       overflowX: "auto",
       overflowY: "scroll",
+    },
+    "h1, h2, h3, h4, h5, h6": {
+      fontFamily: "var(--font-nunito), sans-serif",
     },
   }),
 });

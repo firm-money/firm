@@ -1,7 +1,6 @@
 export const palette = {
-  sky: "#405AE5",
-  blue: "#121B44",
-  green: "#405AE5",
+  gold: "#F2B341",
+  beige: "#EDDBC5",
+  burgundy: "#7F0A07",
   white: "#FFFFFF",
-  rain: "#9EA2B8",
 };

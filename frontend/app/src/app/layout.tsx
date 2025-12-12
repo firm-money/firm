@@ -18,7 +18,17 @@ import { TransactionFlow } from "@/src/services/TransactionFlow";
 import { SubgraphStatus } from "@/src/services/SubgraphStatus";
 import { UiKit } from "@liquity2/uikit";
 import { Analytics } from "@vercel/analytics/react";
-import { GeistSans } from "geist/font/sans";
+import { Work_Sans, Nunito } from "next/font/google";
+
+const workSans = Work_Sans({
+  subsets: ["latin"],
+  variable: "--font-work-sans",
+});
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+});
 
 export const metadata: Metadata = {
   title: content.appName,
@@ -39,7 +49,7 @@ export default function Layout({
 }) {
   return (
     <html lang="en">
-      <body className={GeistSans.className}>
+      <body className={`${workSans.variable} ${nunito.variable}`} style={{ fontFamily: "var(--font-work-sans)" }}>
         <ReactQuery>
           <UiKit>
             <StoredState>

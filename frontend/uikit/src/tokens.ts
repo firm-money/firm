@@ -1,10 +1,10 @@
 import tokenMainToken from "./token-icons/main-token.svg";
-import tokenLqty from "./token-icons/lqty.svg";
-import tokenLusd from "./token-icons/lusd.svg";
 import tokenSbold from "./token-icons/sbold.svg";
+import tokenSnt from "./token-icons/snt.svg";
+import tokenGusd from "./token-icons/gusd.png";
+import tokenLinea from "./token-icons/linea.webp";
 import { WHITE_LABEL_CONFIG } from "../../app/src/white-label.config";
 
-// Import all available collateral icons
 import tokenEth from "./token-icons/eth.svg";
 import tokenReth from "./token-icons/reth.svg";
 import tokenWsteth from "./token-icons/wsteth.svg";
@@ -12,12 +12,14 @@ import tokenWsteth from "./token-icons/wsteth.svg";
 // Map of available token icons by icon name from config
 const tokenIconMap: Record<string, string> = {
   "main-token": tokenMainToken,
-  "governance-token": tokenLqty,
-  "legacy-stablecoin": tokenLusd,
-  "staked-main-token": tokenSbold,
+  "governance-token": tokenSnt,
+  "sbold": tokenSbold,
   "eth": tokenEth,
   "reth": tokenReth,
   "wsteth": tokenWsteth,
+  "snt": tokenSnt,
+  "linea": tokenLinea,
+  "sgusd": tokenGusd,
 };
 
 // any external token, without a known symbol
@@ -95,18 +97,6 @@ const SBOLD_TOKEN: Token = {
   symbol: WHITE_LABEL_CONFIG.tokens.otherTokens.sbold.symbol,
 } as const;
 
-const STAKED_TOKEN: Token = {
-  icon: tokenIconMap[WHITE_LABEL_CONFIG.tokens.otherTokens.staked.icon],
-  name: WHITE_LABEL_CONFIG.tokens.otherTokens.staked.name,
-  symbol: WHITE_LABEL_CONFIG.tokens.otherTokens.staked.symbol,
-} as const;
-
-const LUSD_TOKEN: Token = {
-  icon: tokenIconMap[WHITE_LABEL_CONFIG.tokens.otherTokens.lusd.icon],
-  name: WHITE_LABEL_CONFIG.tokens.otherTokens.lusd.name,
-  symbol: WHITE_LABEL_CONFIG.tokens.otherTokens.lusd.symbol,
-} as const;
-
 // Generate collaterals from config using dynamic icons
 export const COLLATERALS: CollateralToken[] = WHITE_LABEL_CONFIG.tokens.collaterals.map(collateral => {
   const iconUrl = tokenIconMap[collateral.icon];
@@ -121,17 +111,13 @@ export const COLLATERALS: CollateralToken[] = WHITE_LABEL_CONFIG.tokens.collater
   };
 });
 
-// Build tokens map from config-driven definitions
 const tokensMap: Record<string, Token | CollateralToken> = {
   [WHITE_LABEL_CONFIG.tokens.mainToken.symbol]: MAIN_TOKEN,
   [WHITE_LABEL_CONFIG.tokens.governanceToken.symbol]: GOVERNANCE_TOKEN,
   [WHITE_LABEL_CONFIG.tokens.otherTokens.eth.symbol]: ETH_TOKEN,
   [WHITE_LABEL_CONFIG.tokens.otherTokens.sbold.symbol]: SBOLD_TOKEN,
-  [WHITE_LABEL_CONFIG.tokens.otherTokens.staked.symbol]: STAKED_TOKEN,
-  [WHITE_LABEL_CONFIG.tokens.otherTokens.lusd.symbol]: LUSD_TOKEN,
 };
 
-// Add all collaterals to the map
 COLLATERALS.forEach(collateral => {
   tokensMap[collateral.symbol] = collateral;
 });

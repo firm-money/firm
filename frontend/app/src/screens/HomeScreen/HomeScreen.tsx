@@ -78,7 +78,7 @@ export function HomeScreen() {
       >
         <BorrowTable compact={compact} />
         <EarnTable compact={compact} />
-        <YieldSourceTable compact={compact} />
+        {/* <YieldSourceTable compact={compact} /> */}
       </div>
     </div>
   );
@@ -174,7 +174,7 @@ function EarnTable({
           rows={getAvailableEarnPools()
             .filter(pool => pool.type !== 'staked')
             .map((pool) => {
-              const symbol = pool.symbol.toUpperCase();
+              const symbol = pool.symbol;
               
               return (
                 <EarnRewardsRow

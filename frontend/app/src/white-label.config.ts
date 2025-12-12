@@ -7,31 +7,30 @@
 
 export const WHITE_LABEL_CONFIG = {
   brandColors: {
-    primary: "black:700" as const,
-    primaryContent: "white" as const,
-    primaryContentAlt: "gray:300" as const,
+    primary: "gold:500" as const,
+    primaryContent: "burgundy:800" as const,
+    primaryContentAlt: "burgundy:800" as const,
     
-    secondary: "silver:100" as const,
-    secondaryContent: "black:700" as const,
-    secondaryContentAlt: "black:400" as const,
+    secondary: "beige:300" as const,
+    secondaryContent: "burgundy:800" as const,
+    secondaryContentAlt: "gold:500" as const,
     
-    accent1: "red:500" as const,  
+    accent1: "burgundy:800" as const,  
     accent1Content: "white" as const,
-    accent1ContentAlt: "red:100" as const,
+    accent1ContentAlt: "beige:100" as const,
     
-    accent2: "green:500" as const,
-    accent2Content: "black:700" as const,
-    accent2ContentAlt: "green:800" as const,
+    accent2: "gold:500" as const,
+    accent2Content: "burgundy:800" as const,
+    accent2ContentAlt: "burgundy:700" as const,
   },
 
   // ===========================
   // TYPOGRAPHY
   // ===========================
   typography: {
-    // Font family for CSS (used in Panda config)
-    fontFamily: "Geist, sans-serif",
-    // Next.js font import name (should match the import)
-    fontImport: "GeistSans" as const,
+    fontFamily: "'Work Sans', sans-serif",
+    fontImport: "WorkSans" as const,
+    headingFontFamily: "'Nunito', sans-serif",
   },
 
   // ===========================
@@ -40,32 +39,15 @@ export const WHITE_LABEL_CONFIG = {
   tokens: {
     // Main protocol stablecoin
     mainToken: {
-      name: "Your Stablecoin",
-      symbol: "YOUR" as const, 
-      ticker: "YOUR",
+      name: "USF",
+      symbol: "USF" as const, 
+      ticker: "USF",
       decimals: 18,
-      description: "USD-pegged stablecoin by Your Protocol",
+      description: "USD-pegged stablecoin by Firm Protocol",
       icon: "main-token",
       // Core protocol contracts (deployment addresses TBD)
       deployments: {
-        646: { // Ronin
-          token: "0x0000000000000000000000000000000000000000", // TBD - YOUR deployment
-          collateralRegistry: "0x0000000000000000000000000000000000000000", // TBD
-          governance: "0x0000000000000000000000000000000000000000", // TBD
-          hintHelpers: "0x0000000000000000000000000000000000000000", // TBD
-          multiTroveGetter: "0x0000000000000000000000000000000000000000", // TBD
-          exchangeHelpers: "0x0000000000000000000000000000000000000000", // TBD
-        },
-        // Placeholder for build compatibility (remove after deployment)
-        1: { // Mainnet (placeholder)
-          token: "0x0000000000000000000000000000000000000000",
-          collateralRegistry: "0x0000000000000000000000000000000000000000",
-          governance: "0x0000000000000000000000000000000000000000",
-          hintHelpers: "0x0000000000000000000000000000000000000000",
-          multiTroveGetter: "0x0000000000000000000000000000000000000000",
-          exchangeHelpers: "0x0000000000000000000000000000000000000000",
-        },
-        11155111: { // Sepolia (placeholder)
+        1660990954: { // Status Network Sepolia
           token: "0x0000000000000000000000000000000000000000",
           collateralRegistry: "0x0000000000000000000000000000000000000000",
           governance: "0x0000000000000000000000000000000000000000",
@@ -78,21 +60,13 @@ export const WHITE_LABEL_CONFIG = {
 
     // Governance token (exists but no functionality at launch)
     governanceToken: {
-      name: "Your Governance Token",
-      symbol: "GOV" as const,
-      ticker: "GOV",
+      name: "SNT",
+      symbol: "SNT" as const,
+      ticker: "SNT",
       icon: "governance-token",
       // Only used as collateral, no governance features
       deployments: {
-        646: { // Ronin mainnet
-          token: "0x0000000000000000000000000000000000000000",
-          staking: "0x0"
-        },
-        1: {
-          token: "0x0000000000000000000000000000000000000000",
-          staking: "0x0"
-        },
-        11155111: {
+        1660990954: {
           token: "0x0000000000000000000000000000000000000000",
           staking: "0x0"
         },
@@ -111,53 +85,91 @@ export const WHITE_LABEL_CONFIG = {
         maxLTV: 0.9091, // 90.91% max LTV
         // Deployment info (per chain)
         deployments: {
-          646: { // Your chain ID (TBD - needs actual deployment)
-            collToken: "0x0000000000000000000000000000000000000000", // TBD
-            leverageZapper: "0x0000000000000000000000000000000000000000", // TBD
-            stabilityPool: "0x0000000000000000000000000000000000000000", // TBD
-            troveManager: "0x0000000000000000000000000000000000000000", // TBD
-          },
-          // Placeholder deployments for build compatibility
-          1: {
-            collToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-            leverageZapper: "0x978d7188ae01881d254ad7e94874653b0c268004",
-            stabilityPool: "0xf69eb8c0d95d4094c16686769460f678727393cf",
-            troveManager: "0x81d78814df42da2cab0e8870c477bc3ed861de66",
-          },
-          11155111: {
-            collToken: "0x8116d0a0e8d4f0197b428c520953f302adca0b50",
-            leverageZapper: "0x482bf4d6a2e61d259a7f97ef6aac8b3ce5dd9f99",
-            stabilityPool: "0x89fb98c98792c8b9e9d468148c6593fa0fc47b40",
-            troveManager: "0x364038750236739e0cd96d5754516c9b8168fb0c",
+          1660990954: {
+            collToken: "0x0000000000000000000000000000000000000000",
+            leverageZapper: "0x0000000000000000000000000000000000000000",
+            stabilityPool: "0x0000000000000000000000000000000000000000",
+            troveManager: "0x0000000000000000000000000000000000000000",
           },
         },
       },
       {
-        symbol: "RETH" as const,
-        name: "Rocket Pool ETH", 
-        icon: "reth",
-        collateralRatio: 1.1, // 110% MCR for LSTs
-        maxDeposit: "25000000", // $25M initial debt limit
-        maxLTV: 0.9091, // 90.91% max LTV
+        symbol: "wstETH" as const,
+        name: "Wrapped Staked ETH",
+        icon: "wsteth",
+        collateralRatio: 1.1,
+        maxDeposit: "100000000",
+        maxLTV: 0.9091,
         deployments: {
-          646: { // Your chain ID (TBD - needs actual rETH deployment)
-            collToken: "0x0000000000000000000000000000000000000000", // TBD
-            leverageZapper: "0x0000000000000000000000000000000000000000", // TBD
-            stabilityPool: "0x0000000000000000000000000000000000000000", // TBD
-            troveManager: "0x0000000000000000000000000000000000000000", // TBD
+          1660990954: {
+            collToken: "0x0000000000000000000000000000000000000000",
+            leverageZapper: "0x0000000000000000000000000000000000000000",
+            stabilityPool: "0x0000000000000000000000000000000000000000",
+            troveManager: "0x0000000000000000000000000000000000000000",
           },
-          // Placeholder deployments for build compatibility
-          1: {
-            collToken: "0xae78736cd615f374d3085123a210448e74fc6393",
-            leverageZapper: "0x7d5f19a1e48479a95c4eb40fd1a534585026e7e5",
-            stabilityPool: "0xc4463b26be1a6064000558a84ef9b6a58abe4f7a",
-            troveManager: "0xde026433882a9dded65cac4fff8402fafff40fca",
+        },
+      },
+      {
+        symbol: "rETH" as const,
+        name: "Rocket Pool ETH",
+        icon: "reth",
+        collateralRatio: 1.1,
+        maxDeposit: "100000000",
+        maxLTV: 0.9091,
+        deployments: {
+          1660990954: {
+            collToken: "0x0000000000000000000000000000000000000000",
+            leverageZapper: "0x0000000000000000000000000000000000000000",
+            stabilityPool: "0x0000000000000000000000000000000000000000",
+            troveManager: "0x0000000000000000000000000000000000000000",
           },
-          11155111: {
-            collToken: "0xbdb72f78302e6174e48aa5872f0dd986ed6d98d9",
-            leverageZapper: "0x251dfe2078a910c644289f2344fac96bffea7c02",
-            stabilityPool: "0x8492ad1df9f89e4b6c54c81149058172592e1c94",
-            troveManager: "0x310fa1d1d711c75da45952029861bcf0d330aa81",
+        },
+      },
+      {
+        symbol: "SNT" as const,
+        name: "Status Network Token", 
+        icon: "snt",
+        collateralRatio: 1.6,
+        maxDeposit: "5000000",
+        maxLTV: 0.625,
+        deployments: {
+          1660990954: {
+            collToken: "0x0000000000000000000000000000000000000000",
+            leverageZapper: "0x0000000000000000000000000000000000000000",
+            stabilityPool: "0x0000000000000000000000000000000000000000",
+            troveManager: "0x0000000000000000000000000000000000000000",
+          },
+        },
+      },
+      {
+        symbol: "LINEA" as const,
+        name: "Linea", 
+        icon: "linea",
+        collateralRatio: 1.5,
+        maxDeposit: "10000000",
+        maxLTV: 0.666,
+        deployments: {
+          1660990954: {
+            collToken: "0x0000000000000000000000000000000000000000",
+            leverageZapper: "0x0000000000000000000000000000000000000000",
+            stabilityPool: "0x0000000000000000000000000000000000000000",
+            troveManager: "0x0000000000000000000000000000000000000000",
+          },
+        },
+      },
+      {
+        symbol: "sGUSD" as const,
+        name: "Staked GUSD",
+        icon: "sgusd",
+        collateralRatio: 1.2,
+        maxDeposit: "10000000",
+        maxLTV: 0.833,
+        deployments: {
+          1660990954: {
+            collToken: "0x0000000000000000000000000000000000000000",
+            leverageZapper: "0x0000000000000000000000000000000000000000",
+            stabilityPool: "0x0000000000000000000000000000000000000000",
+            troveManager: "0x0000000000000000000000000000000000000000",
           },
         },
       },
@@ -195,29 +207,28 @@ export const WHITE_LABEL_CONFIG = {
   // BRANDING & CONTENT
   // ===========================
   branding: {
-    // Core app identity
-    appName: "Your Protocol V2",        // Full app name for titles, about pages
-    brandName: "Your Protocol",         // Core brand name for protocol/version references
-    appTagline: "Multi-chain stablecoin protocol",
-    appDescription: "Borrow YOUR against multiple collateral types",
-    appUrl: "https://yourprotocol.com/",
+    appName: "Firm Protocol",
+    brandName: "Firm",
+    appTagline: "Decentralized stablecoin protocol",
+    appDescription: "Borrow USF against multiple collateral types",
+    appUrl: "https://firm.org/",
     
     // External links
     links: {
       docs: {
-        base: "https://docs.yourprotocol.com/",
-        redemptions: "https://docs.yourprotocol.com/redemptions",
-        liquidations: "https://docs.yourprotocol.com/liquidations",
-        delegation: "https://docs.yourprotocol.com/delegation",
-        interestRates: "https://docs.yourprotocol.com/interest-rates",
-        earn: "https://docs.yourprotocol.com/earn",
-        staking: "https://docs.yourprotocol.com/staking",
+        base: "https://docs.firm.org/",
+        redemptions: "https://docs.firm.org/redemptions",
+        liquidations: "https://docs.firm.org/liquidations",
+        delegation: "https://docs.firm.org/delegation",
+        interestRates: "https://docs.firm.org/interest-rates",
+        earn: "https://docs.firm.org/earn",
+        staking: "https://docs.firm.org/staking",
       },
-      dune: "https://dune.com/yourprotocol",
-      discord: "https://discord.gg/yourprotocol",
-      github: "https://github.com/yourorg/yourprotocol",
-      x: "https://x.com/yourprotocol",
-      friendlyForkProgram: "https://yourprotocol.com/ecosystem",
+      dune: "https://dune.com/firm",
+      discord: "https://discord.gg/firm",
+      github: "https://github.com/firm/protocol",
+      x: "https://x.com/firmprotocol",
+      friendlyForkProgram: "https://firm.org/ecosystem",
     },
     
     // Feature flags and descriptions
@@ -285,7 +296,7 @@ export function getAvailableEarnPools() {
   if (WHITE_LABEL_CONFIG.earnPools.enableStabilityPools) {
     WHITE_LABEL_CONFIG.tokens.collaterals.forEach(collateral => {
       pools.push({
-        symbol: collateral.symbol.toLowerCase(),
+        symbol: collateral.symbol,
         name: `${collateral.name} Stability Pool`,
         type: 'stability',
       });
@@ -296,7 +307,7 @@ export function getAvailableEarnPools() {
   WHITE_LABEL_CONFIG.earnPools.customPools.forEach(pool => {
     if (pool.enabled) {
       pools.push({
-        symbol: pool.symbol.toLowerCase(),
+        symbol: pool.symbol,
         name: pool.name,
         type: 'custom',
       });
@@ -311,5 +322,5 @@ export function getEarnPoolSymbols() {
 }
 
 export function getCollateralSymbols() {
-  return WHITE_LABEL_CONFIG.tokens.collaterals.map(collateral => collateral.symbol.toLowerCase());
+  return WHITE_LABEL_CONFIG.tokens.collaterals.map(collateral => collateral.symbol);
 }
