@@ -7,12 +7,24 @@ const commitHashCmd = "git log -1 --pretty=format:%h";
 const APP_VERSION_FROM_BUILD = JSON.parse(
   readFileSync("./package.json", "utf-8"),
 ).version;
-const APP_COMMIT_HASH_FROM_BUILD = String(execSync(
-  commitHashCmd + " -- ./ ../uikit/",
-)).trim();
-const CONTRACTS_COMMIT_HASH_FROM_BUILD = String(execSync(
-  commitHashCmd + " -- ../../contracts/addresses/11155111.json",
-)).trim();
+
+let APP_COMMIT_HASH_FROM_BUILD = "unknown";
+try {
+  APP_COMMIT_HASH_FROM_BUILD = String(execSync(
+    commitHashCmd + " -- ./ ../uikit/",
+  )).trim();
+} catch (e) {
+  console.warn("Could not get commit hash:", e.message);
+}
+
+let CONTRACTS_COMMIT_HASH_FROM_BUILD = "unknown";
+try {
+  CONTRACTS_COMMIT_HASH_FROM_BUILD = String(execSync(
+    commitHashCmd + " -- ../../contracts/addresses/11155111.json",
+  )).trim();
+} catch (e) {
+  console.warn("Could not get contracts commit hash:", e.message);
+}
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
