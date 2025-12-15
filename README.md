@@ -7,6 +7,12 @@
 - Direction of a customizable portion of protocol revenues to Status community treasury
 - Gas comp points for protocol users
 
+## List of Technical Changes from Liquity V2
+- Updated price feeds and oracles for these assets on the Status L2 chain: ETH, wstETH, rETH, SNT, LINEA, sGUSD.
+- Updated parameters specific to the Status L2. For example, $0 gas deposits when creating new troves, lowered minimum debt amount to $200, and other small tweaks.
+- Ability to add new collateral branches using governance.
+- Debt limits which are governed by a governance address, and other new safety features.
+
 <img width="830" alt="Liquity V2" src="https://github.com/user-attachments/assets/d9eb5b2a-d437-4472-94d6-07fa537e689a" />
 
 [![Coverage Status](https://coveralls.io/repos/github/liquity/bold/badge.svg?branch=main&t=yZSfc8)](https://coveralls.io/github/liquity/bold?branch=main)
