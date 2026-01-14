@@ -1,6 +1,6 @@
 export const palette = {
-  gold: "#F2B341",
-  beige: "#EDDBC5",
-  burgundy: "#7F0A07",
+  primary: "#2256FC",  // blue - main color
+  secondary: "#F2B342", // yellow
+  background: "#141821", // dark background
   white: "#FFFFFF",
 };

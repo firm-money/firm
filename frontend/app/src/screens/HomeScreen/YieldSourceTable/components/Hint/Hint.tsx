@@ -13,7 +13,7 @@ export const Hint: FC = () => {
       gap: 16,
       padding: "10px 16px 0",
       whiteSpace: "nowrap",
-      background: "#F7F7FF",
+      background: "#2256FC",
       borderRadius: 8,
       userSelect: "none",
       transform: "translateY(-10px)",

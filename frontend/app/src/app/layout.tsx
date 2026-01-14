@@ -49,7 +49,7 @@ export default function Layout({
 }) {
   return (
     <html lang="en">
-      <body className={`${workSans.variable} ${nunito.variable}`} style={{ fontFamily: "var(--font-work-sans)" }}>
+      <body className={`${workSans.variable} ${nunito.variable}`} style={{ fontFamily: "var(--font-work-sans)", backgroundColor: "#141821" }}>
         <ReactQuery>
           <UiKit>
             <StoredState>

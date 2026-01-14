@@ -7,21 +7,21 @@
 
 export const WHITE_LABEL_CONFIG = {
   brandColors: {
-    primary: "gold:500" as const,
-    primaryContent: "burgundy:800" as const,
-    primaryContentAlt: "burgundy:800" as const,
-    
-    secondary: "beige:300" as const,
-    secondaryContent: "burgundy:800" as const,
-    secondaryContentAlt: "gold:500" as const,
-    
-    accent1: "burgundy:800" as const,  
+    primary: "blue:500" as const,
+    primaryContent: "white" as const,
+    primaryContentAlt: "gray:200" as const,
+
+    secondary: "gold:500" as const,
+    secondaryContent: "dark:background" as const,
+    secondaryContentAlt: "blue:500" as const,
+
+    accent1: "blue:600" as const,
     accent1Content: "white" as const,
-    accent1ContentAlt: "beige:100" as const,
-    
+    accent1ContentAlt: "blue:100" as const,
+
     accent2: "gold:500" as const,
-    accent2Content: "burgundy:800" as const,
-    accent2ContentAlt: "burgundy:700" as const,
+    accent2Content: "dark:background" as const,
+    accent2ContentAlt: "dark:surface" as const,
   },
 
   // ===========================

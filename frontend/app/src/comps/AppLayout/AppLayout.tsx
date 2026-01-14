@@ -20,6 +20,23 @@ export function AppLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <Banner />
+      {/* Background stamp decoration */}
+      {/* <div
+        className={css({
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100vh",
+          backgroundImage: "url('/stamp.svg')",
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+          backgroundSize: "100% 100%",
+          opacity: 0.05,
+          pointerEvents: "none",
+          zIndex: 1,
+        })}
+      /> */}
       <div
         className={css({
           display: "flex",
@@ -28,7 +45,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
           width: "100%",
           minHeight: "100vh",
           margin: "0 auto",
-          background: "background",
+          position: "relative",
+          zIndex: 2,
         })}
         style={{
           minWidth: `${MIN_WIDTH}px`,

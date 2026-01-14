@@ -162,7 +162,7 @@ export function PercentageBars({
             fill={`url(#${gradientId})`}
           />
           <rect
-            fill={palette.burgundy}
+            fill={palette.primary}
             height={height}
             width={barWidth}
             x={activeIndex * barWidth + activeIndex * gapWidth}

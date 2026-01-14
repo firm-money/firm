@@ -210,7 +210,7 @@ function ForksInfoDrawer() {
         height: 44 + 20,
         padding: "20px 16px 0",
         whiteSpace: "nowrap",
-        background: "#F7F7FF",
+        background: "#2256FC",
         borderRadius: 8,
         userSelect: "none",
       })}
