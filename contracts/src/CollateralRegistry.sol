@@ -44,10 +44,19 @@ contract CollateralRegistry is ICollateralRegistry {
     // The timestamp of the latest fee operation (redemption or new Bold issuance)
     uint256 public lastFeeOperationTime = block.timestamp;
 
+    // Governor address for updating debt limits
+    address public governor;
+
     event BaseRateUpdated(uint256 _baseRate);
     event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
+    event DebtLimitUpdated(uint256 indexed _index, uint256 _oldLimit, uint256 _newLimit);
 
-    constructor(IBoldToken _boldToken, IERC20Metadata[] memory _tokens, ITroveManager[] memory _troveManagers) {
+    modifier onlyGovernor() {
+        require(msg.sender == governor, "CollateralRegistry: Only governor can call");
+        _;
+    }
+
+    constructor(IBoldToken _boldToken, IERC20Metadata[] memory _tokens, ITroveManager[] memory _troveManagers, address _governor) {
         uint256 numTokens = _tokens.length;
         require(numTokens > 0, "Collateral list cannot be empty");
         require(numTokens <= 10, "Collateral list too long");
@@ -80,6 +89,9 @@ contract CollateralRegistry is ICollateralRegistry {
         // Initialize the baseRate state variable
         baseRate = INITIAL_BASE_RATE;
         emit BaseRateUpdated(INITIAL_BASE_RATE);
+
+        // Set the governor
+        governor = _governor;
     }
 
     struct RedemptionTotals {
@@ -312,5 +324,28 @@ contract CollateralRegistry is ICollateralRegistry {
 
     function _requireAmountGreaterThanZero(uint256 _amount) internal pure {
         require(_amount > 0, "CollateralRegistry: Amount must be greater than zero");
+    }
+
+    // --- Debt Limit Functions ---
+
+    function updateDebtLimit(uint256 _indexTroveManager, uint256 _newDebtLimit) external onlyGovernor {
+        require(_indexTroveManager < totalCollaterals, "Invalid index");
+        uint256 currentDebtLimit = getTroveManager(_indexTroveManager).getDebtLimit();
+        
+        // If increasing, can only double or reset to initial
+        if (_newDebtLimit > currentDebtLimit) {
+            require(
+                _newDebtLimit <= currentDebtLimit * 2 || _newDebtLimit <= getTroveManager(_indexTroveManager).getInitialDebtLimit(),
+                "CollateralRegistry: Debt limit increase by more than 2x is not allowed"
+            );
+        }
+        
+        emit DebtLimitUpdated(_indexTroveManager, currentDebtLimit, _newDebtLimit);
+        getTroveManager(_indexTroveManager).setDebtLimit(_newDebtLimit);
+    }
+
+    function getDebtLimit(uint256 _indexTroveManager) external view returns (uint256) {
+        require(_indexTroveManager < totalCollaterals, "Invalid index");
+        return getTroveManager(_indexTroveManager).getDebtLimit();
     }
 }

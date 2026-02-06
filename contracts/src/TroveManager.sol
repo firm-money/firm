@@ -43,6 +43,11 @@ contract TroveManager is LiquityBase, ITroveManager, ITroveEvents {
     // Liquidation penalty for troves redistributed
     uint256 internal immutable LIQUIDATION_PENALTY_REDISTRIBUTION;
 
+    // Debt limit for this collateral branch
+    uint256 public debtLimit;
+    // Initial debt limit (for governance doubling restrictions)
+    uint256 public initialDebtLimit;
+
     // --- Data structures ---
 
     // Store the necessary data for a trove
@@ -192,6 +197,8 @@ contract TroveManager is LiquityBase, ITroveManager, ITroveEvents {
         SCR = _addressesRegistry.SCR();
         LIQUIDATION_PENALTY_SP = _addressesRegistry.LIQUIDATION_PENALTY_SP();
         LIQUIDATION_PENALTY_REDISTRIBUTION = _addressesRegistry.LIQUIDATION_PENALTY_REDISTRIBUTION();
+        debtLimit = _addressesRegistry.debtLimit();
+        initialDebtLimit = debtLimit;
 
         troveNFT = _addressesRegistry.troveNFT();
         borrowerOperations = _addressesRegistry.borrowerOperations();
@@ -2002,5 +2009,20 @@ contract TroveManager is LiquityBase, ITroveManager, ITroveEvents {
 
         Troves[_troveId].interestBatchManager = address(0);
         Troves[_troveId].batchDebtShares = 0;
+    }
+
+    // --- Debt Limit Functions ---
+
+    function getDebtLimit() external view override returns (uint256) {
+        return debtLimit;
+    }
+
+    function getInitialDebtLimit() external view override returns (uint256) {
+        return initialDebtLimit;
+    }
+
+    function setDebtLimit(uint256 _newDebtLimit) external override {
+        _requireCallerIsCollateralRegistry();
+        debtLimit = _newDebtLimit;
     }
 }
