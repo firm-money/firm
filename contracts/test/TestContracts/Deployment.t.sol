@@ -139,6 +139,7 @@ contract TestDeployer is MetadataDeployment {
         uint256 SCR;
         uint256 LIQUIDATION_PENALTY_SP;
         uint256 LIQUIDATION_PENALTY_REDISTRIBUTION;
+        uint256 DEBT_LIMIT;
     }
 
     struct DeploymentVarsDev {
@@ -225,7 +226,7 @@ contract TestDeployer is MetadataDeployment {
             Zappers memory zappers
         )
     {
-        return deployAndConnectContracts(TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16));
+        return deployAndConnectContracts(TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16, 100_000_000e18));
     }
 
     function deployAndConnectContracts(TroveManagerParams memory troveManagerParams)
@@ -330,7 +331,7 @@ contract TestDeployer is MetadataDeployment {
             vars.troveManagers[vars.i] = ITroveManager(troveManagerAddress);
         }
 
-        collateralRegistry = new CollateralRegistry(boldToken, vars.collaterals, vars.troveManagers);
+        collateralRegistry = new CollateralRegistry(boldToken, vars.collaterals, vars.troveManagers, address(this));
         hintHelpers = new HintHelpers(collateralRegistry);
         multiTroveGetter = new MultiTroveGetter(collateralRegistry);
 
@@ -373,7 +374,8 @@ contract TestDeployer is MetadataDeployment {
             _troveManagerParams.BCR,
             _troveManagerParams.SCR,
             _troveManagerParams.LIQUIDATION_PENALTY_SP,
-            _troveManagerParams.LIQUIDATION_PENALTY_REDISTRIBUTION
+            _troveManagerParams.LIQUIDATION_PENALTY_REDISTRIBUTION,
+            _troveManagerParams.DEBT_LIMIT > 0 ? _troveManagerParams.DEBT_LIMIT : 1e27 // Default 1 billion BOLD
         );
         address troveManagerAddress = getAddress(
             address(this), getBytecode(type(TroveManagerTester).creationCode, address(addressesRegistry)), SALT
@@ -555,7 +557,7 @@ contract TestDeployer is MetadataDeployment {
         vars.troveManagers[2] = ITroveManager(troveManagerAddress);
 
         // Deploy registry and register the TMs
-        result.collateralRegistry = new CollateralRegistryTester(result.boldToken, vars.collaterals, vars.troveManagers);
+        result.collateralRegistry = new CollateralRegistryTester(result.boldToken, vars.collaterals, vars.troveManagers, address(this));
 
         result.hintHelpers = new HintHelpers(result.collateralRegistry);
         result.multiTroveGetter = new MultiTroveGetter(result.collateralRegistry);
@@ -593,7 +595,8 @@ contract TestDeployer is MetadataDeployment {
             _troveManagerParams.BCR,
             _troveManagerParams.SCR,
             _troveManagerParams.LIQUIDATION_PENALTY_SP,
-            _troveManagerParams.LIQUIDATION_PENALTY_REDISTRIBUTION
+            _troveManagerParams.LIQUIDATION_PENALTY_REDISTRIBUTION,
+            _troveManagerParams.DEBT_LIMIT > 0 ? _troveManagerParams.DEBT_LIMIT : 1e27 // Default 1 billion BOLD
         );
         address troveManagerAddress =
             getAddress(address(this), getBytecode(type(TroveManager).creationCode, address(addressesRegistry)), SALT);
