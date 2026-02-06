@@ -10,7 +10,8 @@ uint256 constant _100pct = DECIMAL_PRECISION;
 uint256 constant _1pct = DECIMAL_PRECISION / 100;
 
 // Amount of ETH to be locked in gas pool on opening troves
-uint256 constant ETH_GAS_COMPENSATION = 0.0375 ether;
+// Set to 0 - no gas deposit required
+uint256 constant ETH_GAS_COMPENSATION = 0;
 
 // Liquidation
 uint256 constant MIN_LIQUIDATION_PENALTY_SP = 5e16; // 5%
@@ -38,7 +39,7 @@ uint256 constant LIQUIDATION_PENALTY_REDISTRIBUTION_SETH = 20 * _1pct;
 
 // Fraction of collateral awarded to liquidator
 uint256 constant COLL_GAS_COMPENSATION_DIVISOR = 200; // dividing by 200 yields 0.5%
-uint256 constant COLL_GAS_COMPENSATION_CAP = 2 ether; // Max coll gas compensation capped at 2 ETH
+uint256 constant COLL_GAS_COMPENSATION_CAP = 0.1 ether; // Max coll gas compensation capped at 0.1 ETH (lowered from 2 ETH)
 
 // Minimum amount of net Bold debt a trove must have
 uint256 constant MIN_DEBT = 2000e18;
