@@ -45,9 +45,9 @@ contract RedemptionHelperTest is DevTestSetup {
             accountsList[6]
         );
 
-        params.push(TestDeployer.TroveManagerParams(1.5 ether, 1.1 ether, 0.1 ether, 1.1 ether, 0.05 ether, 0.1 ether));
-        params.push(TestDeployer.TroveManagerParams(1.6 ether, 1.2 ether, 0.1 ether, 1.2 ether, 0.05 ether, 0.2 ether));
-        params.push(TestDeployer.TroveManagerParams(1.6 ether, 1.2 ether, 0.1 ether, 1.2 ether, 0.05 ether, 0.2 ether));
+        params.push(TestDeployer.TroveManagerParams(1.5 ether, 1.1 ether, 0.1 ether, 1.1 ether, 0.05 ether, 0.1 ether, 100_000_000e18));
+        params.push(TestDeployer.TroveManagerParams(1.6 ether, 1.2 ether, 0.1 ether, 1.2 ether, 0.05 ether, 0.2 ether, 100_000_000e18));
+        params.push(TestDeployer.TroveManagerParams(1.6 ether, 1.2 ether, 0.1 ether, 1.2 ether, 0.05 ether, 0.2 ether, 100_000_000e18));
         assertEq(NUM_BRANCHES, 3, "Must update params");
 
         TestDeployer.LiquityContractsDev[] memory tmpBranch;

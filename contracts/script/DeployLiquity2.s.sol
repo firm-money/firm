@@ -229,6 +229,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
         uint256 BCR;
         uint256 LIQUIDATION_PENALTY_SP;
         uint256 LIQUIDATION_PENALTY_REDISTRIBUTION;
+        uint256 DEBT_LIMIT;
     }
 
     struct DeploymentVars {
@@ -370,7 +371,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             SCR: SCR_WETH,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_WETH,
-            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_WETH
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_WETH,
+            DEBT_LIMIT: 100_000_000e18 // $100M
         });
 
         // wstETH
@@ -380,7 +382,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             SCR: SCR_SETH,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SETH,
-            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
+            DEBT_LIMIT: 100_000_000e18 // $100M
         });
 
         // rETH (same as wstETH)
@@ -681,7 +684,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             vars.troveManagers[vars.i] = ITroveManager(troveManagerAddress);
         }
 
-        r.collateralRegistry = new CollateralRegistry(r.boldToken, vars.collaterals, vars.troveManagers);
+        r.collateralRegistry = new CollateralRegistry(r.boldToken, vars.collaterals, vars.troveManagers, deployer);
         r.hintHelpers = new HintHelpers(r.collateralRegistry);
         r.multiTroveGetter = new MultiTroveGetter(r.collateralRegistry);
         r.debtInFrontHelper = new DebtInFrontHelper(r.collateralRegistry, r.hintHelpers);
@@ -741,7 +744,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             _troveManagerParams.BCR,
             _troveManagerParams.SCR,
             _troveManagerParams.LIQUIDATION_PENALTY_SP,
-            _troveManagerParams.LIQUIDATION_PENALTY_REDISTRIBUTION
+            _troveManagerParams.LIQUIDATION_PENALTY_REDISTRIBUTION,
+            _troveManagerParams.DEBT_LIMIT
         );
         address troveManagerAddress = vm.computeCreate2Address(
             SALT, keccak256(getBytecode(type(TroveManager).creationCode, address(addressesRegistry)))
