@@ -40,8 +40,11 @@ contract AddressesRegistry is Ownable, IAddressesRegistry {
     uint256 public immutable LIQUIDATION_PENALTY_SP;
     // Liquidation penalty for troves redistributed
     uint256 public immutable LIQUIDATION_PENALTY_REDISTRIBUTION;
+    // Initial debt limit for this collateral branch
+    uint256 public debtLimit;
 
     error InvalidCCR();
+    error InvalidDebtLimit();
     error InvalidMCR();
     error InvalidBCR();
     error InvalidSCR();
@@ -75,7 +78,8 @@ contract AddressesRegistry is Ownable, IAddressesRegistry {
         uint256 _bcr,
         uint256 _scr,
         uint256 _liquidationPenaltySP,
-        uint256 _liquidationPenaltyRedistribution
+        uint256 _liquidationPenaltyRedistribution,
+        uint256 _debtLimit
     ) Ownable(_owner) {
         if (_ccr <= 1e18 || _ccr >= 2e18) revert InvalidCCR();
         if (_mcr <= 1e18 || _mcr >= 2e18) revert InvalidMCR();
@@ -84,6 +88,7 @@ contract AddressesRegistry is Ownable, IAddressesRegistry {
         if (_liquidationPenaltySP < MIN_LIQUIDATION_PENALTY_SP) revert SPPenaltyTooLow();
         if (_liquidationPenaltySP > _liquidationPenaltyRedistribution) revert SPPenaltyGtRedist();
         if (_liquidationPenaltyRedistribution > MAX_LIQUIDATION_PENALTY_REDISTRIBUTION) revert RedistPenaltyTooHigh();
+        if (_debtLimit == 0) revert InvalidDebtLimit();
 
         CCR = _ccr;
         SCR = _scr;
@@ -91,6 +96,7 @@ contract AddressesRegistry is Ownable, IAddressesRegistry {
         BCR = _bcr;
         LIQUIDATION_PENALTY_SP = _liquidationPenaltySP;
         LIQUIDATION_PENALTY_REDISTRIBUTION = _liquidationPenaltyRedistribution;
+        debtLimit = _debtLimit;
     }
 
     function setAddresses(AddressVars memory _vars) external onlyOwner {

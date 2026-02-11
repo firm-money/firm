@@ -360,6 +360,9 @@ contract BorrowerOperations is LiquityBase, AddRemoveManagers, IBorrowerOperatio
         vars.newTCR = _getNewTCRFromTroveChange(_change, vars.price);
         _requireNewTCRisAboveCCR(vars.newTCR);
 
+        // Check debt limit
+        _requireDebtLimitNotExceeded(vars.entireDebt);
+
         // --- Effects & interactions ---
 
         // Set add/remove managers
@@ -658,6 +661,11 @@ contract BorrowerOperations is LiquityBase, AddRemoveManagers, IBorrowerOperatio
 
         // Check the adjustment satisfies all conditions for the current system mode
         _requireValidAdjustmentInCurrentMode(_troveChange, vars, isTroveInBatch);
+
+        // Check debt limit if debt is increasing
+        if (_troveChange.debtIncrease > 0) {
+            _requireDebtLimitNotExceeded(_troveChange.debtIncrease + _troveChange.upfrontFee);
+        }
 
         // --- Effects and interactions ---
 
@@ -1612,5 +1620,14 @@ contract BorrowerOperations is LiquityBase, AddRemoveManagers, IBorrowerOperatio
         totalDebt -= _troveChange.debtDecrease;
 
         newTCR = LiquityMath._computeCR(totalColl, totalDebt, _price);
+    }
+
+    function _requireDebtLimitNotExceeded(uint256 _debtIncrease) internal view {
+        uint256 entireBranchDebt = getEntireBranchDebt();
+        uint256 debtLimit = troveManager.getDebtLimit();
+        require(
+            debtLimit >= entireBranchDebt + _debtIncrease,
+            "BorrowerOperations: Debt limit exceeded"
+        );
     }
 }
