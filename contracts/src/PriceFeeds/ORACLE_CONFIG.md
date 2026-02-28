@@ -27,7 +27,7 @@ All addresses need to be filled in before deployment.
 
 ## Notes
 
-1. **Staleness threshold**: All feeds use 25 hours (90000 seconds) as the staleness threshold
+1. **Staleness threshold**: All feeds use 25 hours (90000 seconds) as the staleness threshold, including rETH-ETH (fixed from 48h)
 2. **SNT**: Status Network Token - may need a custom oracle or use Chainlink if available
 3. **LINEA**: Linea token - oracle TBD
 4. **sGUSD**: Staked GUSD - likely pegged close to $1, may use GUSD oracle
