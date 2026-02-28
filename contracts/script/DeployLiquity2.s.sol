@@ -660,6 +660,15 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
 
             // RETH
             vars.collaterals[2] = IERC20Metadata(RETH_ADDRESS);
+
+            // SNT
+            vars.collaterals[3] = IERC20Metadata(SNT_ADDRESS);
+
+            // LINEA
+            vars.collaterals[4] = IERC20Metadata(LINEA_ADDRESS);
+
+            // sGUSD
+            vars.collaterals[5] = IERC20Metadata(SGUSD_ADDRESS);
         } else {
             // Sepolia
             // Use WETH as collateral for the first branch
@@ -883,13 +892,37 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                 );
             }
             // RETH
-            assert(_collTokenAddress == RETH_ADDRESS);
-            return new RETHPriceFeed(
-                ETH_ORACLE_ADDRESS,
-                RETH_ORACLE_ADDRESS,
-                RETH_ADDRESS,
-                ETH_USD_STALENESS_THRESHOLD,
-                RETH_ETH_STALENESS_THRESHOLD,
+            } else if (_collTokenAddress == RETH_ADDRESS) {
+                return new RETHPriceFeed(
+                    ETH_ORACLE_ADDRESS,
+                    RETH_ORACLE_ADDRESS,
+                    RETH_ADDRESS,
+                    ETH_USD_STALENESS_THRESHOLD,
+                    RETH_ETH_STALENESS_THRESHOLD,
+                    _borroweOperationsAddress
+                );
+            }
+            // SNT
+            else if (_collTokenAddress == SNT_ADDRESS) {
+                return new SNTPriceFeed(
+                    SNT_ORACLE_ADDRESS,
+                    SNT_USD_STALENESS_THRESHOLD,
+                    _borroweOperationsAddress
+                );
+            }
+            // LINEA
+            else if (_collTokenAddress == LINEA_ADDRESS) {
+                return new LINEAPriceFeed(
+                    LINEA_ORACLE_ADDRESS,
+                    LINEA_USD_STALENESS_THRESHOLD,
+                    _borroweOperationsAddress
+                );
+            }
+            // sGUSD
+            assert(_collTokenAddress == SGUSD_ADDRESS);
+            return new SGUSDPriceFeed(
+                SGUSD_ORACLE_ADDRESS,
+                SGUSD_USD_STALENESS_THRESHOLD,
                 _borroweOperationsAddress
             );
         }
