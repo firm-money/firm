@@ -116,7 +116,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
     // Staleness thresholds
     uint256 ETH_USD_STALENESS_THRESHOLD = 25 hours; // Updated to 25h per spec
     uint256 STETH_USD_STALENESS_THRESHOLD = 25 hours;
-    uint256 RETH_ETH_STALENESS_THRESHOLD = 48 hours;
+    uint256 RETH_ETH_STALENESS_THRESHOLD = 25 hours; // Fixed: was 48h, should match doc (25h)
     uint256 SNT_USD_STALENESS_THRESHOLD = 25 hours;
     uint256 LINEA_USD_STALENESS_THRESHOLD = 25 hours;
     uint256 SGUSD_USD_STALENESS_THRESHOLD = 25 hours;

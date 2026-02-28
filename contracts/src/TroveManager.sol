@@ -375,21 +375,22 @@ contract TroveManager is LiquityBase, ITroveManager, ITroveEvents {
          *  - Send a fraction of the trove's collateral to the Stability Pool, equal to the fraction of its offset debt
          *
          */
+        // L3 fix: Always award gas compensation from total coll, even when SP is empty
+        collGasCompensation = _getCollGasCompensation(_entireTroveColl);
+        uint256 collAfterGasComp = _entireTroveColl - collGasCompensation;
+
         if (_boldInSPForOffsets > 0) {
             debtToOffset = LiquityMath._min(_entireTroveDebt, _boldInSPForOffsets);
-            collSPPortion = _entireTroveColl * debtToOffset / _entireTroveDebt;
-
-            collGasCompensation = _getCollGasCompensation(collSPPortion);
-            uint256 collToOffset = collSPPortion - collGasCompensation;
+            collSPPortion = collAfterGasComp * debtToOffset / _entireTroveDebt;
 
             (collToSendToSP, collSurplus) =
-                _getCollPenaltyAndSurplus(collToOffset, debtToOffset, LIQUIDATION_PENALTY_SP, _price);
+                _getCollPenaltyAndSurplus(collSPPortion, debtToOffset, LIQUIDATION_PENALTY_SP, _price);
         }
 
         // Redistribution
         debtToRedistribute = _entireTroveDebt - debtToOffset;
         if (debtToRedistribute > 0) {
-            uint256 collRedistributionPortion = _entireTroveColl - collSPPortion;
+            uint256 collRedistributionPortion = collAfterGasComp - collSPPortion;
             if (collRedistributionPortion > 0) {
                 (collToRedistribute, collSurplus) = _getCollPenaltyAndSurplus(
                     collRedistributionPortion + collSurplus, // Coll surplus from offset can be eaten up by red. penalty
