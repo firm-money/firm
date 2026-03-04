@@ -196,6 +196,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
         uint256 BCR;
         uint256 LIQUIDATION_PENALTY_SP;
         uint256 LIQUIDATION_PENALTY_REDISTRIBUTION;
+        uint256 DEBT_LIMIT;
     }
 
     struct DeploymentVars {
@@ -337,7 +338,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             SCR: SCR_WETH,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_WETH,
-            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_WETH
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_WETH,
+            DEBT_LIMIT: DEBT_LIMIT_ETH
         });
 
         // wstETH
@@ -347,7 +349,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             SCR: SCR_SETH,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SETH,
-            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
+            DEBT_LIMIT: DEBT_LIMIT_LST
         });
 
         // rETH (same as wstETH)
