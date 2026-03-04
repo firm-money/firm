@@ -28,7 +28,6 @@ import * as dn from "dnum";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { HomeTable } from "./HomeTable";
-import { YieldSourceTable } from "./YieldSourceTable";
 
 type ForkInfo = (typeof FORKS_INFO)[number];
 
@@ -78,7 +77,7 @@ export function HomeScreen() {
       >
         <BorrowTable compact={compact} />
         <EarnTable compact={compact} />
-        <YieldSourceTable compact={compact} />
+        {/* <YieldSourceTable compact={compact} /> */}
       </div>
     </div>
   );
@@ -174,7 +173,7 @@ function EarnTable({
           rows={getAvailableEarnPools()
             .filter(pool => pool.type !== 'staked')
             .map((pool) => {
-              const symbol = pool.symbol.toUpperCase();
+              const symbol = pool.symbol;
               
               return (
                 <EarnRewardsRow
@@ -211,7 +210,7 @@ function ForksInfoDrawer() {
         height: 44 + 20,
         padding: "20px 16px 0",
         whiteSpace: "nowrap",
-        background: "#F7F7FF",
+        background: "#2256FC",
         borderRadius: 8,
         userSelect: "none",
       })}

@@ -9,7 +9,22 @@ import {IERC20 as IERC20_GOV} from "openzeppelin/contracts/token/ERC20/IERC20.so
 import {StringFormatting} from "test/Utils/StringFormatting.sol";
 import {Accounts} from "test/TestContracts/Accounts.sol";
 import {ERC20Faucet} from "test/TestContracts/ERC20Faucet.sol";
-import {ETH_GAS_COMPENSATION} from "src/Dependencies/Constants.sol";
+import {
+    ETH_GAS_COMPENSATION,
+    BCR_ALL,
+    CCR_WETH, MCR_WETH, SCR_WETH,
+    CCR_SETH, MCR_SETH, SCR_SETH,
+    CCR_SNT, MCR_SNT, SCR_SNT,
+    CCR_LINEA, MCR_LINEA, SCR_LINEA,
+    CCR_SGUSD, MCR_SGUSD, SCR_SGUSD,
+    LIQUIDATION_PENALTY_SP_WETH, LIQUIDATION_PENALTY_REDISTRIBUTION_WETH,
+    LIQUIDATION_PENALTY_SP_SETH, LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
+    LIQUIDATION_PENALTY_SP_SNT, LIQUIDATION_PENALTY_REDISTRIBUTION_SNT,
+    LIQUIDATION_PENALTY_SP_LINEA, LIQUIDATION_PENALTY_REDISTRIBUTION_LINEA,
+    LIQUIDATION_PENALTY_SP_SGUSD, LIQUIDATION_PENALTY_REDISTRIBUTION_SGUSD,
+    DEBT_LIMIT_ETH, DEBT_LIMIT_WSTETH, DEBT_LIMIT_RETH,
+    DEBT_LIMIT_SNT, DEBT_LIMIT_LINEA, DEBT_LIMIT_SGUSD
+} from "src/Dependencies/Constants.sol";
 import {IBorrowerOperations} from "src/Interfaces/IBorrowerOperations.sol";
 import "src/AddressesRegistry.sol";
 import "src/ActivePool.sol";
@@ -29,6 +44,9 @@ import "src/StabilityPool.sol";
 import "src/PriceFeeds/WETHPriceFeed.sol";
 import "src/PriceFeeds/WSTETHPriceFeed.sol";
 import "src/PriceFeeds/RETHPriceFeed.sol";
+import "src/PriceFeeds/SNTPriceFeed.sol";
+import "src/PriceFeeds/LINEAPriceFeed.sol";
+import "src/PriceFeeds/SGUSDPriceFeed.sol";
 import "src/CollateralRegistry.sol";
 import "test/TestContracts/PriceFeedTestnet.sol";
 import "test/TestContracts/MetadataDeployment.sol";
@@ -70,7 +88,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
     string constant DEPLOYMENT_MODE_BOLD_ONLY = "bold-only";
     string constant DEPLOYMENT_MODE_USE_EXISTING_BOLD = "use-existing-bold";
 
-    uint256 constant NUM_BRANCHES = 3;
+    uint256 constant NUM_BRANCHES = 6; // ETH, wstETH, rETH, SNT, LINEA, sGUSD
 
     address WETH_ADDRESS = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
     address USDC_ADDRESS = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
@@ -81,12 +99,27 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
     IERC20Metadata USDC;
     address WSTETH_ADDRESS = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
     address RETH_ADDRESS = 0xae78736Cd615f374D3085123A210448E74Fc6393;
+    // TODO: Fill in actual token addresses for new collaterals
+    address SNT_ADDRESS = address(0); // Status Network Token
+    address LINEA_ADDRESS = address(0); // LINEA token
+    address SGUSD_ADDRESS = address(0); // sGUSD token
+    
+    // Oracle addresses
     address ETH_ORACLE_ADDRESS = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
     address RETH_ORACLE_ADDRESS = 0x536218f9E9Eb48863970252233c8F271f554C2d0;
     address STETH_ORACLE_ADDRESS = 0xCfE54B5cD566aB89272946F602D76Ea879CAb4a8;
-    uint256 ETH_USD_STALENESS_THRESHOLD = 24 hours;
-    uint256 STETH_USD_STALENESS_THRESHOLD = 24 hours;
+    // TODO: Fill in oracle addresses for new collaterals
+    address SNT_ORACLE_ADDRESS = address(0);
+    address LINEA_ORACLE_ADDRESS = address(0);
+    address SGUSD_ORACLE_ADDRESS = address(0);
+    
+    // Staleness thresholds
+    uint256 ETH_USD_STALENESS_THRESHOLD = 25 hours; // Updated to 25h per spec
+    uint256 STETH_USD_STALENESS_THRESHOLD = 25 hours;
     uint256 RETH_ETH_STALENESS_THRESHOLD = 48 hours;
+    uint256 SNT_USD_STALENESS_THRESHOLD = 25 hours;
+    uint256 LINEA_USD_STALENESS_THRESHOLD = 25 hours;
+    uint256 SGUSD_USD_STALENESS_THRESHOLD = 25 hours;
 
     // V1
     address LQTY_ADDRESS = 0x6DEA81C8171D0bA574754EF6F8b412F2Ed88c54D;
@@ -339,7 +372,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_WETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_WETH,
-            DEBT_LIMIT: DEBT_LIMIT_ETH
+            DEBT_LIMIT: 100_000_000e18 // $100M
         });
 
         // wstETH
@@ -350,18 +383,54 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
-            DEBT_LIMIT: DEBT_LIMIT_LST
+            DEBT_LIMIT: 100_000_000e18 // $100M
         });
 
         // rETH (same as wstETH)
         troveManagerParamsArray[2] = troveManagerParamsArray[1];
 
-        string[] memory collNames = new string[](2);
-        string[] memory collSymbols = new string[](2);
+        // SNT (Status Network Token)
+        troveManagerParamsArray[3] = TroveManagerParams({
+            CCR: CCR_SNT,
+            MCR: MCR_SNT,
+            SCR: SCR_SNT,
+            BCR: BCR_ALL,
+            LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SNT,
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SNT
+        });
+
+        // LINEA
+        troveManagerParamsArray[4] = TroveManagerParams({
+            CCR: CCR_LINEA,
+            MCR: MCR_LINEA,
+            SCR: SCR_LINEA,
+            BCR: BCR_ALL,
+            LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_LINEA,
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_LINEA
+        });
+
+        // sGUSD (staked GUSD - stablecoin)
+        troveManagerParamsArray[5] = TroveManagerParams({
+            CCR: CCR_SGUSD,
+            MCR: MCR_SGUSD,
+            SCR: SCR_SGUSD,
+            BCR: BCR_ALL,
+            LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SGUSD,
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SGUSD
+        });
+
+        string[] memory collNames = new string[](5); // All except WETH (index 0)
+        string[] memory collSymbols = new string[](5);
         collNames[0] = "Wrapped liquid staked Ether 2.0";
         collSymbols[0] = "wstETH";
         collNames[1] = "Rocket Pool ETH";
         collSymbols[1] = "rETH";
+        collNames[2] = "Status Network Token";
+        collSymbols[2] = "SNT";
+        collNames[3] = "LINEA";
+        collSymbols[3] = "LINEA";
+        collNames[4] = "Staked GUSD";
+        collSymbols[4] = "sGUSD";
 
         DeployGovernanceParams memory deployGovernanceParams = DeployGovernanceParams({
             epochStart: epochStart,
@@ -615,7 +684,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             vars.troveManagers[vars.i] = ITroveManager(troveManagerAddress);
         }
 
-        r.collateralRegistry = new CollateralRegistry(r.boldToken, vars.collaterals, vars.troveManagers);
+        r.collateralRegistry = new CollateralRegistry(r.boldToken, vars.collaterals, vars.troveManagers, deployer);
         r.hintHelpers = new HintHelpers(r.collateralRegistry);
         r.multiTroveGetter = new MultiTroveGetter(r.collateralRegistry);
         r.debtInFrontHelper = new DebtInFrontHelper(r.collateralRegistry, r.hintHelpers);
@@ -675,7 +744,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             _troveManagerParams.BCR,
             _troveManagerParams.SCR,
             _troveManagerParams.LIQUIDATION_PENALTY_SP,
-            _troveManagerParams.LIQUIDATION_PENALTY_REDISTRIBUTION
+            _troveManagerParams.LIQUIDATION_PENALTY_REDISTRIBUTION,
+            _troveManagerParams.DEBT_LIMIT
         );
         address troveManagerAddress = vm.computeCreate2Address(
             SALT, keccak256(getBytecode(type(TroveManager).creationCode, address(addressesRegistry)))

@@ -28,7 +28,7 @@ const TABS = [
 export function EarnPoolScreen() {
   const params = useParams();
 
-  const collateralSymbol = String(params.pool).toUpperCase();
+  const collateralSymbol = String(params.pool);
   if (!isCollateralSymbol(collateralSymbol)) {
     throw new Error("Invalid collateral symbol");
   }

@@ -1,7 +1,6 @@
 export const palette = {
-  sky: "#405AE5",
-  blue: "#121B44",
-  green: "#405AE5",
+  primary: "#2256FC",  // blue - main color
+  secondary: "#F2B342", // yellow
+  background: "#141821", // dark background
   white: "#FFFFFF",
-  rain: "#9EA2B8",
 };

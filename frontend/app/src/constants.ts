@@ -106,17 +106,10 @@ export const DEFAULT_LEGACY_CHECKS = new Map<
   ChainId,
   Exclude<v.InferOutput<ReturnType<typeof vEnvLegacyCheck>>, boolean>
 >([
-  // mainnet
-  [1, {
-    ...getDeploymentInfo(1),
-    INITIATIVES_SNAPSHOT_URL: "/initiatives-snapshot-1.json",
-    TROVES_SNAPSHOT_URL: "/troves-snapshot-1.json",
-  }],
-  // sepolia
-  [11155111, {
-    ...getDeploymentInfo(11155111),
-    INITIATIVES_SNAPSHOT_URL: "/initiatives-snapshot-11155111.json",
-    TROVES_SNAPSHOT_URL: "/troves-snapshot-11155111.json",
+  [1660990954, {
+    ...getDeploymentInfo(1660990954),
+    INITIATIVES_SNAPSHOT_URL: "/initiatives-snapshot-1660990954.json",
+    TROVES_SNAPSHOT_URL: "/troves-snapshot-1660990954.json",
   }],
 ]);
 
@@ -125,22 +118,10 @@ export const DEFAULT_STRATEGIES: Array<[
   ChainId,
   Array<[BranchId, IcStrategy[]]>,
 ]> = [
-  // mainnet
-  [1, [
-    // ETH
+  [1660990954, [
     [0, [{
       name: "Conservative Strategy",
-      address: "0xE507E4d0763851A6287238aadD243948D18AB60a",
-    }]],
-    // WSTETH
-    [1, [{
-      name: "Conservative Strategy",
-      address: "0x8869a6FB59a8Df330F90D9Fbf46eBfaFf6D4BC14",
-    }]],
-    // RETH
-    [2, [{
-      name: "Conservative Strategy",
-      address: "0x7700B2D305f47aE82e9598BAb6D7CCb57299A82b",
+      address: "0x0000000000000000000000000000000000000000",
     }]],
   ]],
 ];
