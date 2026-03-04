@@ -6,3 +6,4 @@ CLAUDE.md
 package-lock.json
 
 .env
+contracts/foundry.lock

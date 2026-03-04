@@ -73,15 +73,6 @@ uint256 constant COLL_GAS_COMPENSATION_CAP = 0.1 ether; // Max coll gas compensa
 // Minimum amount of net Bold debt a trove must have
 uint256 constant MIN_DEBT = 2000e18;
 
-//Debt Limits
-uint256 constant DEBT_LIMIT_ETH = 100000000e18; // 100M USF
-uint256 constant DEBT_LIMIT_LST = 100000000e18; // 100M USF
-uint256 constant DEBT_LIMIT_SNT = 2000000e18; // 2M USF
-uint256 constant DEBT_LIMIT_LINEAR = 2000000e18; // 2M USF
-uint256 constant DEBT_LIMIT_USD = 5000000e18; // 5M USF
-
-
-
 uint256 constant MIN_ANNUAL_INTEREST_RATE = _1pct / 2; // 0.5%
 uint256 constant MAX_ANNUAL_INTEREST_RATE = 250 * _1pct;
 

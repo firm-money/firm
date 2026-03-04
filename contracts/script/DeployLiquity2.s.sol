@@ -396,7 +396,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             SCR: SCR_SNT,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SNT,
-            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SNT
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SNT,
+            DEBT_LIMIT: 2_000_000e18 // $2M
         });
 
         // LINEA
@@ -406,7 +407,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             SCR: SCR_LINEA,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_LINEA,
-            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_LINEA
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_LINEA,
+            DEBT_LIMIT: 2_000_000e18 // $2M
         });
 
         // sGUSD (staked GUSD - stablecoin)
@@ -416,7 +418,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             SCR: SCR_SGUSD,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SGUSD,
-            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SGUSD
+            LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SGUSD,
+            DEBT_LIMIT: 5_000_000e18 // $5M
         });
 
         string[] memory collNames = new string[](5); // All except WETH (index 0)
