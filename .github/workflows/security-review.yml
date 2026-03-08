@@ -1,0 +1,49 @@
+name: Security Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  security-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Security Review
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-20250514
+          direct_prompt: |
+            You are a senior Solidity security auditor reviewing a pull request for Firm Money,
+            a Liquity V2 fork deploying the USF stablecoin on Status L2.
+
+            Review the PR diff with a security-first mindset. Focus on:
+
+            1. **Reentrancy** — external calls before state updates, cross-function reentrancy
+            2. **Access control** — missing modifiers, privilege escalation, unprotected initializers
+            3. **Integer overflow/underflow** — unchecked math, precision loss, rounding errors
+            4. **Oracle manipulation** — stale prices, sandwich attacks, TWAP bypasses
+            5. **Flash loan attacks** — single-transaction exploits on price or governance
+            6. **Liquidation edge cases** — bad debt socialization, gas griefing, empty stability pool
+            7. **Token integration** — fee-on-transfer, rebasing, non-standard ERC20
+            8. **Frontrunning** — MEV extraction, transaction ordering dependencies
+            9. **DoS vectors** — unbounded loops, block gas limit, griefing via dust
+            10. **Logic errors** — incorrect comparisons, off-by-one, wrong variable used
+
+            For each finding, report:
+            - **Severity**: Critical / High / Medium / Low / Informational
+            - **Location**: file:line
+            - **Description**: What's wrong
+            - **Impact**: What an attacker could do
+            - **Recommendation**: How to fix it
+
+            If the PR looks clean, say so — don't invent issues.
+            Focus only on changed files. Be concise.
