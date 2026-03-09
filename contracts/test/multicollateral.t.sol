@@ -3,6 +3,14 @@
 pragma solidity ^0.8.18;
 
 import {Math} from "openzeppelin-contracts/contracts/utils/math/Math.sol";
+import {
+    CCR_WETH, MCR_WETH, SCR_WETH, BCR_ALL, _1pct,
+    LIQUIDATION_PENALTY_SP_WETH, LIQUIDATION_PENALTY_REDISTRIBUTION_WETH,
+    CCR_SETH, MCR_SETH, SCR_SETH,
+    LIQUIDATION_PENALTY_SP_SETH, LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
+    ETH_COLL_GAS_COMPENSATION_CAP, STETH_COLL_GAS_COMPENSATION_CAP,
+    MIN_ANNUAL_INTEREST_RATE
+} from "src/Dependencies/Constants.sol";
 import "./TestContracts/DevTestSetup.sol";
 
 contract MulticollateralTest is DevTestSetup {
@@ -68,10 +76,14 @@ contract MulticollateralTest is DevTestSetup {
 
         TestDeployer.TroveManagerParams[] memory troveManagerParamsArray =
             new TestDeployer.TroveManagerParams[](NUM_COLLATERALS);
-        troveManagerParamsArray[0] = TestDeployer.TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16, 100_000_000e18);
-        troveManagerParamsArray[1] = TestDeployer.TroveManagerParams(160e16, 110e16, 10e16, 110e16, 5e16, 20e16, 100_000_000e18);
-        troveManagerParamsArray[2] = TestDeployer.TroveManagerParams(160e16, 110e16, 10e16, 110e16, 5e16, 20e16, 100_000_000e18);
-        troveManagerParamsArray[3] = TestDeployer.TroveManagerParams(160e16, 125e16, 10e16, 125e16, 5e16, 10e16, 100_000_000e18);
+        troveManagerParamsArray[0] =
+            TestDeployer.TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16, 100_000_000e18, 0.125 ether);
+        troveManagerParamsArray[1] =
+            TestDeployer.TroveManagerParams(160e16, 110e16, 10e16, 110e16, 5e16, 20e16, 100_000_000e18, 0.125 ether);
+        troveManagerParamsArray[2] =
+            TestDeployer.TroveManagerParams(160e16, 110e16, 10e16, 110e16, 5e16, 20e16, 100_000_000e18, 0.125 ether);
+        troveManagerParamsArray[3] =
+            TestDeployer.TroveManagerParams(160e16, 125e16, 10e16, 125e16, 5e16, 10e16, 100_000_000e18, 0.125 ether);
 
         TestDeployer deployer = new TestDeployer();
         TestDeployer.LiquityContractsDev[] memory _contractsArray;
@@ -777,7 +789,8 @@ contract CsBold013 is TestAccounts {
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_WETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_WETH,
-            DEBT_LIMIT: 100_000_000e18
+            DEBT_LIMIT: 100_000_000e18,
+            COLL_GAS_COMPENSATION_CAP: ETH_COLL_GAS_COMPENSATION_CAP
         });
 
         // wstETH
@@ -788,7 +801,8 @@ contract CsBold013 is TestAccounts {
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
-            DEBT_LIMIT: 100_000_000e18
+            DEBT_LIMIT: 100_000_000e18,
+            COLL_GAS_COMPENSATION_CAP: STETH_COLL_GAS_COMPENSATION_CAP
         });
 
         // rETH (same as wstETH)

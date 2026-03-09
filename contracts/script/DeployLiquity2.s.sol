@@ -23,7 +23,10 @@ import {
     LIQUIDATION_PENALTY_SP_LINEA, LIQUIDATION_PENALTY_REDISTRIBUTION_LINEA,
     LIQUIDATION_PENALTY_SP_SGUSD, LIQUIDATION_PENALTY_REDISTRIBUTION_SGUSD,
     DEBT_LIMIT_ETH, DEBT_LIMIT_WSTETH, DEBT_LIMIT_RETH,
-    DEBT_LIMIT_SNT, DEBT_LIMIT_LINEA, DEBT_LIMIT_SGUSD
+    DEBT_LIMIT_SNT, DEBT_LIMIT_LINEA, DEBT_LIMIT_SGUSD,
+    ETH_COLL_GAS_COMPENSATION_CAP, STETH_COLL_GAS_COMPENSATION_CAP,
+    SNT_COLL_GAS_COMPENSATION_CAP, LINEA_COLL_GAS_COMPENSATION_CAP,
+    SGUSD_COLL_GAS_COMPENSATION_CAP
 } from "src/Dependencies/Constants.sol";
 import {IBorrowerOperations} from "src/Interfaces/IBorrowerOperations.sol";
 import "src/AddressesRegistry.sol";
@@ -230,6 +233,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
         uint256 LIQUIDATION_PENALTY_SP;
         uint256 LIQUIDATION_PENALTY_REDISTRIBUTION;
         uint256 DEBT_LIMIT;
+        uint256 BRANCH_COLL_GAS_COMPENSATION_CAP;
     }
 
     struct DeploymentVars {
@@ -372,7 +376,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_WETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_WETH,
-            DEBT_LIMIT: 100_000_000e18 // $100M
+            DEBT_LIMIT: 100_000_000e18, // $100M
+            BRANCH_COLL_GAS_COMPENSATION_CAP: ETH_COLL_GAS_COMPENSATION_CAP
         });
 
         // wstETH
@@ -383,7 +388,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
-            DEBT_LIMIT: 100_000_000e18 // $100M
+            DEBT_LIMIT: 100_000_000e18, // $100M
+            BRANCH_COLL_GAS_COMPENSATION_CAP: STETH_COLL_GAS_COMPENSATION_CAP
         });
 
         // rETH (same as wstETH)
@@ -397,7 +403,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SNT,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SNT,
-            DEBT_LIMIT: 2_000_000e18 // $2M
+            DEBT_LIMIT: 2_000_000e18, // $2M
+            BRANCH_COLL_GAS_COMPENSATION_CAP: SNT_COLL_GAS_COMPENSATION_CAP
         });
 
         // LINEA
@@ -408,7 +415,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_LINEA,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_LINEA,
-            DEBT_LIMIT: 2_000_000e18 // $2M
+            DEBT_LIMIT: 2_000_000e18, // $2M
+            BRANCH_COLL_GAS_COMPENSATION_CAP: LINEA_COLL_GAS_COMPENSATION_CAP
         });
 
         // sGUSD (staked GUSD - stablecoin)
@@ -419,7 +427,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SGUSD,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SGUSD,
-            DEBT_LIMIT: 5_000_000e18 // $5M
+            DEBT_LIMIT: 5_000_000e18, // $5M
+            BRANCH_COLL_GAS_COMPENSATION_CAP: SGUSD_COLL_GAS_COMPENSATION_CAP
         });
 
         string[] memory collNames = new string[](5); // All except WETH (index 0)
@@ -631,6 +640,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
         return abi.encodePacked(_creationCode, abi.encode(_addressesRegistry));
     }
 
+
     function _deployAndConnectContracts(
         TroveManagerParams[] memory troveManagerParamsArray,
         string[] memory _collNames,
@@ -701,6 +711,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                 r.usdcCurvePool,
                 vars.addressesRegistries[vars.i],
                 address(vars.troveManagers[vars.i]),
+                troveManagerParamsArray[vars.i].COLL_GAS_COMPENSATION_CAP,
                 r.hintHelpers,
                 r.multiTroveGetter,
                 computeGovernanceAddress(_deployGovernanceParams)
@@ -751,7 +762,13 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             _troveManagerParams.DEBT_LIMIT
         );
         address troveManagerAddress = vm.computeCreate2Address(
-            SALT, keccak256(getBytecode(type(TroveManager).creationCode, address(addressesRegistry)))
+            SALT,
+            keccak256(
+                abi.encodePacked(
+                    type(TroveManager).creationCode,
+                    abi.encode(address(addressesRegistry), _troveManagerParams.COLL_GAS_COMPENSATION_CAP)
+                )
+            )
         );
 
         return (addressesRegistry, troveManagerAddress);
@@ -764,6 +781,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
         ICurveStableswapNGPool _usdcCurvePool,
         IAddressesRegistry _addressesRegistry,
         address _troveManagerAddress,
+        uint256 _collGasCompensationCap,
         IHintHelpers _hintHelpers,
         IMultiTroveGetter _multiTroveGetter,
         address _governance
@@ -833,7 +851,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
         contracts.addressesRegistry.setAddresses(addressVars);
 
         contracts.borrowerOperations = new BorrowerOperations{salt: SALT}(contracts.addressesRegistry);
-        contracts.troveManager = new TroveManager{salt: SALT}(contracts.addressesRegistry);
+        contracts.troveManager = new TroveManager{salt: SALT}(contracts.addressesRegistry, _collGasCompensationCap);
         contracts.troveNFT = new TroveNFT{salt: SALT}(contracts.addressesRegistry);
         contracts.stabilityPool = new StabilityPool{salt: SALT}(contracts.addressesRegistry);
         contracts.activePool = new ActivePool{salt: SALT}(contracts.addressesRegistry);
