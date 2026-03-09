@@ -7,7 +7,9 @@ import "../../src/TroveManager.sol";
 // Same as TroveManager but with a public call for
 // redeemCollateralFromTrove
 contract TroveManagerHarness is TroveManager {
-    constructor(IAddressesRegistry _addressesRegistry) TroveManager(_addressesRegistry) {}
+    constructor(IAddressesRegistry _addressesRegistry, uint256 _collGasCompensationCap)
+        TroveManager(_addressesRegistry, _collGasCompensationCap)
+    {}
 
     function redeemCollateralFromTroveHarnessed (
         IDefaultPool _defaultPool,

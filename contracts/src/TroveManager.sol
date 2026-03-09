@@ -43,6 +43,9 @@ contract TroveManager is LiquityBase, ITroveManager, ITroveEvents {
     // Liquidation penalty for troves redistributed
     uint256 internal immutable LIQUIDATION_PENALTY_REDISTRIBUTION;
 
+    // Max collateral gas compensation for liquidators (per branch)
+    uint256 internal immutable collGasCompensationCap;
+
     // Debt limit for this collateral branch
     uint256 public debtLimit;
     // Initial debt limit (for governance doubling restrictions)
@@ -191,12 +194,13 @@ contract TroveManager is LiquityBase, ITroveManager, ITroveEvents {
     event SortedTrovesAddressChanged(address _sortedTrovesAddress);
     event CollateralRegistryAddressChanged(address _collateralRegistryAddress);
 
-    constructor(IAddressesRegistry _addressesRegistry) LiquityBase(_addressesRegistry) {
+    constructor(IAddressesRegistry _addressesRegistry, uint256 _collGasCompensationCap) LiquityBase(_addressesRegistry) {
         CCR = _addressesRegistry.CCR();
         MCR = _addressesRegistry.MCR();
         SCR = _addressesRegistry.SCR();
         LIQUIDATION_PENALTY_SP = _addressesRegistry.LIQUIDATION_PENALTY_SP();
         LIQUIDATION_PENALTY_REDISTRIBUTION = _addressesRegistry.LIQUIDATION_PENALTY_REDISTRIBUTION();
+        collGasCompensationCap = _collGasCompensationCap;
         debtLimit = _addressesRegistry.debtLimit();
         initialDebtLimit = debtLimit;
 
@@ -339,9 +343,8 @@ contract TroveManager is LiquityBase, ITroveManager, ITroveEvents {
     }
 
     // Return the amount of Coll to be drawn from a trove's collateral and sent as gas compensation.
-    function _getCollGasCompensation(uint256 _coll) internal pure returns (uint256) {
-        // _entireDebt should never be zero, but we add the condition defensively to avoid an unexpected revert
-        return LiquityMath._min(_coll / COLL_GAS_COMPENSATION_DIVISOR, COLL_GAS_COMPENSATION_CAP);
+    function _getCollGasCompensation(uint256 _coll) internal view returns (uint256) {
+        return LiquityMath._min(_coll / COLL_GAS_COMPENSATION_DIVISOR, collGasCompensationCap);
     }
 
     /* In a full liquidation, returns the values for a trove's coll and debt to be offset, and coll and debt to be

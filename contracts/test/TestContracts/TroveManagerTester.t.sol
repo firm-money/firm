@@ -16,7 +16,9 @@ contract TroveManagerTester is ITroveManagerTester, TroveManager {
     // Extra buffer of collateral ratio to join a batch or adjust a trove inside a batch (on top of MCR)
     uint256 public immutable BCR;
 
-    constructor(IAddressesRegistry _addressesRegistry) TroveManager(_addressesRegistry) {
+    constructor(IAddressesRegistry _addressesRegistry, uint256 _collGasCompensationCap)
+        TroveManager(_addressesRegistry, _collGasCompensationCap)
+    {
         BCR = _addressesRegistry.BCR();
     }
 
@@ -105,7 +107,7 @@ contract TroveManagerTester is ITroveManagerTester, TroveManager {
 
     function getCollGasCompensation(uint256 _entireColl, uint256 _entireDebt, uint256 _boldInSPForOffsets)
         external
-        pure
+        view
         returns (uint256)
     {
         uint256 collSubjectToGasCompensation = _entireColl;
@@ -115,7 +117,7 @@ contract TroveManagerTester is ITroveManagerTester, TroveManager {
         return _getCollGasCompensation(collSubjectToGasCompensation);
     }
 
-    function getCollGasCompensation(uint256 _coll) external pure returns (uint256) {
+    function getCollGasCompensation(uint256 _coll) external view returns (uint256) {
         return _getCollGasCompensation(_coll);
     }
 
