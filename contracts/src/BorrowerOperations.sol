@@ -2,8 +2,6 @@
 
 pragma solidity 0.8.24;
 
-import "openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
-
 import "./Interfaces/IBorrowerOperations.sol";
 import "./Interfaces/IAddressesRegistry.sol";
 import "./Interfaces/ITroveManager.sol";
@@ -16,8 +14,6 @@ import "./Types/LatestTroveData.sol";
 import "./Types/LatestBatchData.sol";
 
 contract BorrowerOperations is LiquityBase, AddRemoveManagers, IBorrowerOperations {
-    using SafeERC20 for IERC20;
-
     // --- Connected contract declarations ---
 
     IERC20 internal immutable collToken;
@@ -1304,7 +1300,7 @@ contract BorrowerOperations is LiquityBase, AddRemoveManagers, IBorrowerOperatio
 
     function _pullCollAndSendToActivePool(IActivePool _activePool, uint256 _amount) internal {
         // Send Coll tokens from sender to active pool
-        collToken.safeTransferFrom(msg.sender, address(_activePool), _amount);
+        collToken.transferFrom(msg.sender, address(_activePool), _amount);
         // Make sure Active Pool accountancy is right
         _activePool.accountForReceivedColl(_amount);
     }

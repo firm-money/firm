@@ -376,7 +376,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_WETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_WETH,
-            DEBT_LIMIT: 100_000_000e18, // $100M
+            DEBT_LIMIT: DEBT_LIMIT_ETH, // $100M
             BRANCH_COLL_GAS_COMPENSATION_CAP: ETH_COLL_GAS_COMPENSATION_CAP
         });
 
@@ -388,7 +388,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
-            DEBT_LIMIT: 100_000_000e18, // $100M
+            DEBT_LIMIT: DEBT_LIMIT_WSTETH
             BRANCH_COLL_GAS_COMPENSATION_CAP: STETH_COLL_GAS_COMPENSATION_CAP
         });
 
@@ -403,7 +403,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SNT,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SNT,
-            DEBT_LIMIT: 2_000_000e18, // $2M
+            DEBT_LIMIT: DEBT_LIMIT_SNT
             BRANCH_COLL_GAS_COMPENSATION_CAP: SNT_COLL_GAS_COMPENSATION_CAP
         });
 
@@ -415,7 +415,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_LINEA,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_LINEA,
-            DEBT_LIMIT: 2_000_000e18, // $2M
+            DEBT_LIMIT: DEBT_LIMIT_LINEA
             BRANCH_COLL_GAS_COMPENSATION_CAP: LINEA_COLL_GAS_COMPENSATION_CAP
         });
 
@@ -427,7 +427,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SGUSD,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SGUSD,
-            DEBT_LIMIT: 5_000_000e18, // $5M
+            DEBT_LIMIT: DEBT_LIMIT_SGUSD
             BRANCH_COLL_GAS_COMPENSATION_CAP: SGUSD_COLL_GAS_COMPENSATION_CAP
         });
 
@@ -673,6 +673,15 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
 
             // RETH
             vars.collaterals[2] = IERC20Metadata(RETH_ADDRESS);
+
+            // SNT
+            vars.collaterals[3] = IERC20Metadata(SNT_ADDRESS);
+
+            // LINEA
+            vars.collaterals[4] = IERC20Metadata(LINEA_ADDRESS);
+
+            // sGUSD
+            vars.collaterals[5] = IERC20Metadata(SGUSD_ADDRESS);
         } else {
             // Sepolia
             // Use WETH as collateral for the first branch
@@ -904,13 +913,37 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                 );
             }
             // RETH
-            assert(_collTokenAddress == RETH_ADDRESS);
-            return new RETHPriceFeed(
-                ETH_ORACLE_ADDRESS,
-                RETH_ORACLE_ADDRESS,
-                RETH_ADDRESS,
-                ETH_USD_STALENESS_THRESHOLD,
-                RETH_ETH_STALENESS_THRESHOLD,
+            } else if (_collTokenAddress == RETH_ADDRESS) {
+                return new RETHPriceFeed(
+                    ETH_ORACLE_ADDRESS,
+                    RETH_ORACLE_ADDRESS,
+                    RETH_ADDRESS,
+                    ETH_USD_STALENESS_THRESHOLD,
+                    RETH_ETH_STALENESS_THRESHOLD,
+                    _borroweOperationsAddress
+                );
+            }
+            // SNT
+            else if (_collTokenAddress == SNT_ADDRESS) {
+                return new SNTPriceFeed(
+                    SNT_ORACLE_ADDRESS,
+                    SNT_USD_STALENESS_THRESHOLD,
+                    _borroweOperationsAddress
+                );
+            }
+            // LINEA
+            else if (_collTokenAddress == LINEA_ADDRESS) {
+                return new LINEAPriceFeed(
+                    LINEA_ORACLE_ADDRESS,
+                    LINEA_USD_STALENESS_THRESHOLD,
+                    _borroweOperationsAddress
+                );
+            }
+            // sGUSD
+            assert(_collTokenAddress == SGUSD_ADDRESS);
+            return new SGUSDPriceFeed(
+                SGUSD_ORACLE_ADDRESS,
+                SGUSD_USD_STALENESS_THRESHOLD,
                 _borroweOperationsAddress
             );
         }
