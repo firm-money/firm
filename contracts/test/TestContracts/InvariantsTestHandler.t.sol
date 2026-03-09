@@ -28,7 +28,6 @@ import {TestDeployer} from "./Deployment.t.sol";
 import {
     _100pct,
     _1pct,
-    COLL_GAS_COMPENSATION_CAP,
     COLL_GAS_COMPENSATION_DIVISOR,
     DECIMAL_PRECISION,
     ETH_GAS_COMPENSATION,
@@ -50,6 +49,8 @@ import {
     UPFRONT_INTEREST_PERIOD,
     URGENT_REDEMPTION_BONUS
 } from "src/Dependencies/Constants.sol";
+
+uint256 constant COLL_GAS_COMPENSATION_CAP = 0.125 ether;
 
 uint256 constant TIME_DELTA_MIN = 0;
 uint256 constant TIME_DELTA_MAX = ONE_YEAR;
