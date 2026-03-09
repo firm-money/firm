@@ -372,7 +372,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_WETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_WETH,
-            DEBT_LIMIT: 100_000_000e18 // $100M
+            DEBT_LIMIT: DEBT_LIMIT_ETH
         });
 
         // wstETH
@@ -383,7 +383,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
-            DEBT_LIMIT: 100_000_000e18 // $100M
+            DEBT_LIMIT: DEBT_LIMIT_WSTETH
         });
 
         // rETH (same as wstETH)
@@ -397,7 +397,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SNT,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SNT,
-            DEBT_LIMIT: 2_000_000e18 // $2M
+            DEBT_LIMIT: DEBT_LIMIT_SNT
         });
 
         // LINEA
@@ -408,7 +408,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_LINEA,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_LINEA,
-            DEBT_LIMIT: 2_000_000e18 // $2M
+            DEBT_LIMIT: DEBT_LIMIT_LINEA
         });
 
         // sGUSD (staked GUSD - stablecoin)
@@ -419,7 +419,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SGUSD,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SGUSD,
-            DEBT_LIMIT: 5_000_000e18 // $5M
+            DEBT_LIMIT: DEBT_LIMIT_SGUSD
         });
 
         string[] memory collNames = new string[](5); // All except WETH (index 0)
