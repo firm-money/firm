@@ -83,7 +83,8 @@ contract SNTPriceFeedTest is Test {
         priceFeed = new SNTPriceFeed(
             address(mockOracle),
             STALENESS_THRESHOLD,
-            address(mockBorrowerOps)
+            address(mockBorrowerOps),
+            address(this)
         );
     }
 
@@ -102,6 +103,25 @@ contract SNTPriceFeedTest is Test {
         
         assertEq(price, 0.10e18);
         assertFalse(oracleFailure);
+    }
+
+    function test_GovernanceCanUpdateOracle() public {
+        // Deploy a second mock oracle with different price
+        MockAggregator newOracle = new MockAggregator(0.20e8, 8);
+
+        // Governor (this contract) can update
+        priceFeed.setEthUsdOracle(address(newOracle));
+
+        (uint256 price,) = priceFeed.fetchPrice();
+        assertEq(price, 0.20e18);
+    }
+
+    function test_NonGovernorCannotUpdateOracle() public {
+        MockAggregator newOracle = new MockAggregator(0.20e8, 8);
+
+        vm.prank(address(0x123));
+        vm.expectRevert("MainnetPriceFeedBase: Only governor can call");
+        priceFeed.setEthUsdOracle(address(newOracle));
     }
 
     function test_StaleOracleTriggersShutdown() public {
@@ -138,7 +158,8 @@ contract LINEAPriceFeedTest is Test {
         priceFeed = new LINEAPriceFeed(
             address(mockOracle),
             STALENESS_THRESHOLD,
-            address(mockBorrowerOps)
+            address(mockBorrowerOps),
+            address(this)
         );
     }
 
@@ -176,7 +197,8 @@ contract SGUSDPriceFeedTest is Test {
         priceFeed = new SGUSDPriceFeed(
             address(mockOracle),
             STALENESS_THRESHOLD,
-            address(mockBorrowerOps)
+            address(mockBorrowerOps),
+            address(this)
         );
     }
 

@@ -9,6 +9,13 @@ import "../BorrowerOperations.sol";
 // import "forge-std/console2.sol";
 
 abstract contract MainnetPriceFeedBase is IMainnetPriceFeed {
+    address public governor;
+
+    modifier onlyGovernor() {
+        require(msg.sender == governor, "MainnetPriceFeedBase: Only governor can call");
+        _;
+    }
+
     // Determines where the PriceFeed sources data from. Possible states:
     // - primary: Uses the primary price calculation, which depends on the specific feed
     // - ETHUSDxCanonical: Uses Chainlink's ETH-USD multiplied by the LST' canonical rate
@@ -34,20 +41,40 @@ abstract contract MainnetPriceFeedBase is IMainnetPriceFeed {
     error InsufficientGasForExternalCall();
 
     event ShutDownFromOracleFailure(address _failedOracleAddr);
+    event OracleAddressUpdated(string _oracleType, address _oldAddress, address _newAddress);
 
     Oracle public ethUsdOracle;
 
     IBorrowerOperations borrowerOperations;
 
-    constructor(address _ethUsdOracleAddress, uint256 _ethUsdStalenessThreshold, address _borrowOperationsAddress) {
+    constructor(
+        address _ethUsdOracleAddress,
+        uint256 _ethUsdStalenessThreshold,
+        address _borrowOperationsAddress,
+        address _governor
+    ) {
         // Store ETH-USD oracle
         ethUsdOracle.aggregator = AggregatorV3Interface(_ethUsdOracleAddress);
         ethUsdOracle.stalenessThreshold = _ethUsdStalenessThreshold;
         ethUsdOracle.decimals = ethUsdOracle.aggregator.decimals();
 
         borrowerOperations = IBorrowerOperations(_borrowOperationsAddress);
+        governor = _governor;
 
         assert(ethUsdOracle.decimals == 8);
+    }
+
+    /// @notice Update the primary oracle address. Callable only by governor.
+    /// @param _newOracleAddress The new Chainlink aggregator address (must return 8 decimals).
+    function setEthUsdOracle(address _newOracleAddress) external onlyGovernor {
+        require(_newOracleAddress != address(0), "MainnetPriceFeedBase: Oracle address cannot be zero");
+
+        address oldAddress = address(ethUsdOracle.aggregator);
+        ethUsdOracle.aggregator = AggregatorV3Interface(_newOracleAddress);
+        ethUsdOracle.decimals = ethUsdOracle.aggregator.decimals();
+        assert(ethUsdOracle.decimals == 8);
+
+        emit OracleAddressUpdated("ethUsd", oldAddress, _newOracleAddress);
     }
 
     function _getOracleAnswer(Oracle memory _oracle) internal view returns (uint256, bool) {

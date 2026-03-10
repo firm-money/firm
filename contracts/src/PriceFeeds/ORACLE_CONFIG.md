@@ -25,6 +25,16 @@ All addresses need to be filled in before deployment.
 | LINEA | $2,000,000 | TBD | TBD | TBD | 5% |
 | sGUSD | $5,000,000 | 110% | 110% | 125% | 5% |
 
+## Governance: Oracle Updates
+
+Governance can update oracle addresses on each price feed:
+
+- **All price feeds** (via MainnetPriceFeedBase): `setEthUsdOracle(address)` — updates the primary oracle (ETH-USD, SNT-USD, etc.)
+- **WSTETHPriceFeed**: `setStEthUsdOracle(address)` — updates the STETH-USD oracle
+- **RETHPriceFeed**: `setREthEthOracle(address)` — updates the RETH-ETH oracle
+
+All setters are restricted to the `governor` address (same as CollateralRegistry governor). New oracle addresses must implement AggregatorV3Interface; USD-denominated oracles must return 8 decimals.
+
 ## Notes
 
 1. **Staleness threshold**: All feeds use 25 hours (90000 seconds) as the staleness threshold, including rETH-ETH (fixed from 48h)

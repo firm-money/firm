@@ -16,9 +16,9 @@ contract SNTPriceFeed is MainnetPriceFeedBase {
     constructor(
         address _sntUsdOracleAddress,
         uint256 _sntUsdStalenessThreshold,
-        address _borrowerOperationsAddress
-    )
-        MainnetPriceFeedBase(_sntUsdOracleAddress, _sntUsdStalenessThreshold, _borrowerOperationsAddress)
+        address _borrowerOperationsAddress,
+        address _governor
+    ) MainnetPriceFeedBase(_sntUsdOracleAddress, _sntUsdStalenessThreshold, _borrowerOperationsAddress, _governor)
     {
         _fetchPricePrimary();
 

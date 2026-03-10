@@ -16,8 +16,9 @@ abstract contract CompositePriceFeed is MainnetPriceFeedBase {
         address _ethUsdOracleAddress,
         address _rateProviderAddress,
         uint256 _ethUsdStalenessThreshold,
-        address _borrowerOperationsAddress
-    ) MainnetPriceFeedBase(_ethUsdOracleAddress, _ethUsdStalenessThreshold, _borrowerOperationsAddress) {
+        address _borrowerOperationsAddress,
+        address _governor
+    ) MainnetPriceFeedBase(_ethUsdOracleAddress, _ethUsdStalenessThreshold, _borrowerOperationsAddress, _governor) {
         // Store rate provider
         rateProviderAddress = _rateProviderAddress;
     }

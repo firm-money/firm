@@ -19,9 +19,9 @@ contract SGUSDPriceFeed is MainnetPriceFeedBase {
     constructor(
         address _sgusdUsdOracleAddress,
         uint256 _sgusdUsdStalenessThreshold,
-        address _borrowerOperationsAddress
-    )
-        MainnetPriceFeedBase(_sgusdUsdOracleAddress, _sgusdUsdStalenessThreshold, _borrowerOperationsAddress)
+        address _borrowerOperationsAddress,
+        address _governor
+    ) MainnetPriceFeedBase(_sgusdUsdOracleAddress, _sgusdUsdStalenessThreshold, _borrowerOperationsAddress, _governor)
     {
         _fetchPricePrimary();
 

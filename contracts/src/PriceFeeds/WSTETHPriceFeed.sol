@@ -13,15 +13,18 @@ contract WSTETHPriceFeed is CompositePriceFeed, IWSTETHPriceFeed {
 
     uint256 public constant STETH_USD_DEVIATION_THRESHOLD = 1e16; // 1%
 
+    event StEthUsdOracleAddressUpdated(address _oldAddress, address _newAddress);
+
     constructor(
         address _ethUsdOracleAddress,
         address _stEthUsdOracleAddress,
         address _wstEthTokenAddress,
         uint256 _ethUsdStalenessThreshold,
         uint256 _stEthUsdStalenessThreshold,
-        address _borrowerOperationsAddress
+        address _borrowerOperationsAddress,
+        address _governor
     )
-        CompositePriceFeed(_ethUsdOracleAddress, _wstEthTokenAddress, _ethUsdStalenessThreshold, _borrowerOperationsAddress)
+        CompositePriceFeed(_ethUsdOracleAddress, _wstEthTokenAddress, _ethUsdStalenessThreshold, _borrowerOperationsAddress, _governor)
     {
         stEthUsdOracle.aggregator = AggregatorV3Interface(_stEthUsdOracleAddress);
         stEthUsdOracle.stalenessThreshold = _stEthUsdStalenessThreshold;
@@ -68,6 +71,19 @@ contract WSTETHPriceFeed is CompositePriceFeed, IWSTETHPriceFeed {
         lastGoodPrice = wstEthUsdPrice;
 
         return (wstEthUsdPrice, false);
+    }
+
+    /// @notice Update the STETH-USD oracle address. Callable only by governor.
+    /// @param _newOracleAddress The new Chainlink aggregator address (must return 8 decimals).
+    function setStEthUsdOracle(address _newOracleAddress) external onlyGovernor {
+        require(_newOracleAddress != address(0), "WSTETHPriceFeed: Oracle address cannot be zero");
+
+        address oldAddress = address(stEthUsdOracle.aggregator);
+        stEthUsdOracle.aggregator = AggregatorV3Interface(_newOracleAddress);
+        stEthUsdOracle.decimals = stEthUsdOracle.aggregator.decimals();
+        assert(stEthUsdOracle.decimals == 8);
+
+        emit StEthUsdOracleAddressUpdated(oldAddress, _newOracleAddress);
     }
 
     function _getCanonicalRate() internal view override returns (uint256, bool) {

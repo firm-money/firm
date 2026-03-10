@@ -9,15 +9,18 @@ import "../Interfaces/IRETHPriceFeed.sol";
 // import "forge-std/console2.sol";
 
 contract RETHPriceFeed is CompositePriceFeed, IRETHPriceFeed {
+    event REthEthOracleAddressUpdated(address _oldAddress, address _newAddress);
+
     constructor(
         address _ethUsdOracleAddress,
         address _rEthEthOracleAddress,
         address _rEthTokenAddress,
         uint256 _ethUsdStalenessThreshold,
         uint256 _rEthEthStalenessThreshold,
-        address _borrowerOperationsAddress
+        address _borrowerOperationsAddress,
+        address _governor
     )
-        CompositePriceFeed(_ethUsdOracleAddress, _rEthTokenAddress, _ethUsdStalenessThreshold, _borrowerOperationsAddress)
+        CompositePriceFeed(_ethUsdOracleAddress, _rEthTokenAddress, _ethUsdStalenessThreshold, _borrowerOperationsAddress, _governor)
     {
         // Store RETH-ETH oracle
         rEthEthOracle.aggregator = AggregatorV3Interface(_rEthEthOracleAddress);
@@ -78,6 +81,18 @@ contract RETHPriceFeed is CompositePriceFeed, IRETHPriceFeed {
         lastGoodPrice = rEthUsdPrice;
 
         return (rEthUsdPrice, false);
+    }
+
+    /// @notice Update the RETH-ETH oracle address. Callable only by governor.
+    /// @param _newOracleAddress The new Chainlink aggregator address (must return 18 decimals for ETH-denominated rate).
+    function setREthEthOracle(address _newOracleAddress) external onlyGovernor {
+        require(_newOracleAddress != address(0), "RETHPriceFeed: Oracle address cannot be zero");
+
+        address oldAddress = address(rEthEthOracle.aggregator);
+        rEthEthOracle.aggregator = AggregatorV3Interface(_newOracleAddress);
+        rEthEthOracle.decimals = rEthEthOracle.aggregator.decimals();
+
+        emit REthEthOracleAddressUpdated(oldAddress, _newOracleAddress);
     }
 
     function _getCanonicalRate() internal view override returns (uint256, bool) {
