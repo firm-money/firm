@@ -140,6 +140,7 @@ contract TestDeployer is MetadataDeployment {
         uint256 LIQUIDATION_PENALTY_SP;
         uint256 LIQUIDATION_PENALTY_REDISTRIBUTION;
         uint256 DEBT_LIMIT;
+        uint256 COLL_GAS_COMPENSATION_CAP;
     }
 
     struct DeploymentVarsDev {
@@ -183,6 +184,7 @@ contract TestDeployer is MetadataDeployment {
         IWETH weth;
         IAddressesRegistry addressesRegistry;
         address troveManagerAddress;
+        uint256 collGasCompensationCap;
         IHintHelpers hintHelpers;
         IMultiTroveGetter multiTroveGetter;
         ICurveStableswapNGPool usdcCurvePool;
@@ -207,6 +209,7 @@ contract TestDeployer is MetadataDeployment {
         return abi.encodePacked(_creationCode, abi.encode(_addressesRegistry));
     }
 
+
     function getAddress(address _deployer, bytes memory _bytecode, bytes32 _salt) public pure returns (address) {
         bytes32 hash = keccak256(abi.encodePacked(bytes1(0xff), _deployer, _salt, keccak256(_bytecode)));
 
@@ -226,7 +229,9 @@ contract TestDeployer is MetadataDeployment {
             Zappers memory zappers
         )
     {
-        return deployAndConnectContracts(TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16, 100_000_000e18));
+        return deployAndConnectContracts(
+            TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16, 100_000_000e18, 0.125 ether)
+        );
     }
 
     function deployAndConnectContracts(TroveManagerParams memory troveManagerParams)
@@ -335,19 +340,8 @@ contract TestDeployer is MetadataDeployment {
         hintHelpers = new HintHelpers(collateralRegistry);
         multiTroveGetter = new MultiTroveGetter(collateralRegistry);
 
-        (contractsArray[0], zappersArray[0]) = _deployAndConnectCollateralContractsDev(
-            _WETH,
-            boldToken,
-            collateralRegistry,
-            _WETH,
-            vars.addressesRegistries[0],
-            address(vars.troveManagers[0]),
-            hintHelpers,
-            multiTroveGetter
-        );
-
-        // Deploy the remaining branches with LST collateral
-        for (vars.i = 1; vars.i < vars.numCollaterals; vars.i++) {
+        for (vars.i = 0; vars.i < vars.numCollaterals; vars.i++) {
+            uint256 cap = troveManagerParamsArray[vars.i].COLL_GAS_COMPENSATION_CAP;
             (contractsArray[vars.i], zappersArray[vars.i]) = _deployAndConnectCollateralContractsDev(
                 vars.collaterals[vars.i],
                 boldToken,
@@ -355,6 +349,7 @@ contract TestDeployer is MetadataDeployment {
                 _WETH,
                 vars.addressesRegistries[vars.i],
                 address(vars.troveManagers[vars.i]),
+                cap,
                 hintHelpers,
                 multiTroveGetter
             );
@@ -378,7 +373,12 @@ contract TestDeployer is MetadataDeployment {
             _troveManagerParams.DEBT_LIMIT > 0 ? _troveManagerParams.DEBT_LIMIT : 1e27 // Default 1 billion BOLD
         );
         address troveManagerAddress = getAddress(
-            address(this), getBytecode(type(TroveManagerTester).creationCode, address(addressesRegistry)), SALT
+            address(this),
+            abi.encodePacked(
+                type(TroveManagerTester).creationCode,
+                abi.encode(address(addressesRegistry), _troveManagerParams.COLL_GAS_COMPENSATION_CAP)
+            ),
+            SALT
         );
 
         return (addressesRegistry, troveManagerAddress);
@@ -391,6 +391,7 @@ contract TestDeployer is MetadataDeployment {
         IWETH _weth,
         IAddressesRegistry _addressesRegistry,
         address _troveManagerAddress,
+        uint256 _collGasCompensationCap,
         IHintHelpers _hintHelpers,
         IMultiTroveGetter _multiTroveGetter
     ) internal returns (LiquityContractsDev memory contracts, Zappers memory zappers) {
@@ -462,7 +463,7 @@ contract TestDeployer is MetadataDeployment {
         contracts.addressesRegistry.setAddresses(addressVars);
 
         contracts.borrowerOperations = new BorrowerOperationsTester{salt: SALT}(contracts.addressesRegistry);
-        contracts.troveManager = new TroveManagerTester{salt: SALT}(contracts.addressesRegistry);
+        contracts.troveManager = new TroveManagerTester{salt: SALT}(contracts.addressesRegistry, _collGasCompensationCap);
         contracts.troveNFT = new TroveNFT{salt: SALT}(contracts.addressesRegistry);
         contracts.stabilityPool = new StabilityPool{salt: SALT}(contracts.addressesRegistry);
         contracts.activePool = new ActivePool{salt: SALT}(contracts.addressesRegistry);
@@ -574,6 +575,7 @@ contract TestDeployer is MetadataDeployment {
             params.weth = WETH;
             params.addressesRegistry = vars.addressesRegistries[vars.i];
             params.troveManagerAddress = address(vars.troveManagers[vars.i]);
+            params.collGasCompensationCap = _troveManagerParamsArray[vars.i].COLL_GAS_COMPENSATION_CAP;
             params.hintHelpers = result.hintHelpers;
             params.multiTroveGetter = result.multiTroveGetter;
             params.usdcCurvePool = usdcCurvePool;
@@ -598,8 +600,14 @@ contract TestDeployer is MetadataDeployment {
             _troveManagerParams.LIQUIDATION_PENALTY_REDISTRIBUTION,
             _troveManagerParams.DEBT_LIMIT > 0 ? _troveManagerParams.DEBT_LIMIT : 1e27 // Default 1 billion BOLD
         );
-        address troveManagerAddress =
-            getAddress(address(this), getBytecode(type(TroveManager).creationCode, address(addressesRegistry)), SALT);
+        address troveManagerAddress = getAddress(
+            address(this),
+            abi.encodePacked(
+                type(TroveManager).creationCode,
+                abi.encode(address(addressesRegistry), _troveManagerParams.COLL_GAS_COMPENSATION_CAP)
+            ),
+            SALT
+        );
 
         return (addressesRegistry, troveManagerAddress);
     }
@@ -680,7 +688,8 @@ contract TestDeployer is MetadataDeployment {
         contracts.addressesRegistry.setAddresses(addressVars);
 
         contracts.borrowerOperations = new BorrowerOperationsTester{salt: SALT}(contracts.addressesRegistry);
-        contracts.troveManager = new TroveManager{salt: SALT}(contracts.addressesRegistry);
+        contracts.troveManager =
+            new TroveManager{salt: SALT}(contracts.addressesRegistry, _params.collGasCompensationCap);
         contracts.troveNFT = new TroveNFT{salt: SALT}(contracts.addressesRegistry);
         contracts.stabilityPool = new StabilityPool{salt: SALT}(contracts.addressesRegistry);
         contracts.activePool = new ActivePool{salt: SALT}(contracts.addressesRegistry);

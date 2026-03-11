@@ -27,7 +27,8 @@ contract ZapperWETHTest is DevTestSetup {
         WETH = new WETH9();
 
         TestDeployer.TroveManagerParams[] memory troveManagerParams = new TestDeployer.TroveManagerParams[](1);
-        troveManagerParams[0] = TestDeployer.TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16, 100_000_000e18);
+        troveManagerParams[0] =
+            TestDeployer.TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16, 100_000_000e18, 0.125 ether);
 
         TestDeployer deployer = new TestDeployer();
         TestDeployer.LiquityContractsDev[] memory contractsArray;

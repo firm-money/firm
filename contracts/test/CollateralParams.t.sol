@@ -148,7 +148,7 @@ contract CollateralParamsTest is Test {
     // =============================================================
     
     function test_ETH_GasCompensation() public pure {
-        assertEq(ETH_GAS_COMPENSATION, 0.0375 ether, "Gas compensation should be 0.0375 ETH");
+        assertEq(ETH_GAS_COMPENSATION, 0, "Gas compensation is set to 0 (no gas deposit required)");
     }
     
     function test_MinDebt() public pure {
@@ -156,7 +156,7 @@ contract CollateralParamsTest is Test {
     }
     
     function test_CollGasCompensationCap() public pure {
-        assertEq(COLL_GAS_COMPENSATION_CAP, 2 ether, "Coll gas compensation cap should be 2 ETH");
+        assertEq(ETH_COLL_GAS_COMPENSATION_CAP, 0.125 ether, "ETH coll gas compensation cap should be 0.125 ETH");
     }
     
     function test_BatchCRBuffer() public pure {
