@@ -43,6 +43,8 @@ abstract contract MainnetPriceFeedBase is IMainnetPriceFeed {
     event ShutDownFromOracleFailure(address _failedOracleAddr);
     event OracleAddressUpdated(string _oracleType, address _oldAddress, address _newAddress);
 
+    event GovernanceRenounced(address _oldGovernor);
+
     Oracle public ethUsdOracle;
 
     IBorrowerOperations borrowerOperations;
@@ -62,6 +64,11 @@ abstract contract MainnetPriceFeedBase is IMainnetPriceFeed {
         governor = _governor;
 
         assert(ethUsdOracle.decimals == 8);
+    }
+
+    function renounceGovernance() external onlyGovernor {
+        governor = address(0);
+        emit GovernanceRenounced(msg.sender);
     }
 
     /// @notice Update the primary oracle address. Callable only by governor.
