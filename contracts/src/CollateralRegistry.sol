@@ -13,29 +13,29 @@ import "./Interfaces/ICollateralRegistry.sol";
 
 contract CollateralRegistry is ICollateralRegistry {
     // See: https://github.com/ethereum/solidity/issues/12587
-    uint256 public immutable totalCollaterals;
+    uint256 public totalCollaterals;
 
-    IERC20Metadata internal immutable token0;
-    IERC20Metadata internal immutable token1;
-    IERC20Metadata internal immutable token2;
-    IERC20Metadata internal immutable token3;
-    IERC20Metadata internal immutable token4;
-    IERC20Metadata internal immutable token5;
-    IERC20Metadata internal immutable token6;
-    IERC20Metadata internal immutable token7;
-    IERC20Metadata internal immutable token8;
-    IERC20Metadata internal immutable token9;
+    IERC20Metadata internal token0;
+    IERC20Metadata internal token1;
+    IERC20Metadata internal token2;
+    IERC20Metadata internal token3;
+    IERC20Metadata internal token4;
+    IERC20Metadata internal token5;
+    IERC20Metadata internal token6;
+    IERC20Metadata internal token7;
+    IERC20Metadata internal token8;
+    IERC20Metadata internal token9;
 
-    ITroveManager internal immutable troveManager0;
-    ITroveManager internal immutable troveManager1;
-    ITroveManager internal immutable troveManager2;
-    ITroveManager internal immutable troveManager3;
-    ITroveManager internal immutable troveManager4;
-    ITroveManager internal immutable troveManager5;
-    ITroveManager internal immutable troveManager6;
-    ITroveManager internal immutable troveManager7;
-    ITroveManager internal immutable troveManager8;
-    ITroveManager internal immutable troveManager9;
+    ITroveManager internal troveManager0;
+    ITroveManager internal troveManager1;
+    ITroveManager internal troveManager2;
+    ITroveManager internal troveManager3;
+    ITroveManager internal troveManager4;
+    ITroveManager internal troveManager5;
+    ITroveManager internal troveManager6;
+    ITroveManager internal troveManager7;
+    ITroveManager internal troveManager8;
+    ITroveManager internal troveManager9;
 
     IBoldToken public immutable boldToken;
 
@@ -50,6 +50,7 @@ contract CollateralRegistry is ICollateralRegistry {
     event BaseRateUpdated(uint256 _baseRate);
     event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
     event DebtLimitUpdated(uint256 indexed _index, uint256 _oldLimit, uint256 _newLimit);
+    event CollateralAdded(uint256 indexed _index, IERC20Metadata _token, ITroveManager _troveManager);
 
     modifier onlyGovernor() {
         require(msg.sender == governor, "CollateralRegistry: Only governor can call");
@@ -324,6 +325,51 @@ contract CollateralRegistry is ICollateralRegistry {
 
     function _requireAmountGreaterThanZero(uint256 _amount) internal pure {
         require(_amount > 0, "CollateralRegistry: Amount must be greater than zero");
+    }
+
+    // --- Add branch functions ---
+
+    function addCollateral(IERC20Metadata _token, ITroveManager _troveManager) external onlyGovernor {
+        require(totalCollaterals < 10, "CollateralRegistry: Maximum number of branches reached");
+        require(address(_token) != address(0), "CollateralRegistry: Token cannot be the zero address");
+        require(address(_troveManager) != address(0), "CollateralRegistry: Trove manager cannot be the zero address");
+
+        uint256 collIndex = totalCollaterals;
+
+        if (collIndex == 9) {
+            token9 = _token;
+            troveManager9 = _troveManager;
+        } else if (collIndex == 8) {
+            token8 = _token;
+            troveManager8 = _troveManager;
+        } else if (collIndex == 7) {
+            token7 = _token;
+            troveManager7 = _troveManager;
+        } else if (collIndex == 6) {
+            token6 = _token;
+            troveManager6 = _troveManager;
+        } else if (collIndex == 5) {
+            token5 = _token;
+            troveManager5 = _troveManager;
+        } else if (collIndex == 4) {
+            token4 = _token;
+            troveManager4 = _troveManager;
+        } else if (collIndex == 3) {
+            token3 = _token;
+            troveManager3 = _troveManager;
+        } else if (collIndex == 2) {
+            token2 = _token;
+            troveManager2 = _troveManager;
+        } else if (collIndex == 1) {
+            token1 = _token;
+            troveManager1 = _troveManager;
+        } else {
+            token0 = _token;
+            troveManager0 = _troveManager;
+        }
+
+        totalCollaterals = collIndex + 1;
+        emit CollateralAdded(collIndex, _token, _troveManager);
     }
 
     // --- Debt Limit Functions ---
