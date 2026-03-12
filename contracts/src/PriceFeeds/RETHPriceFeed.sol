@@ -9,7 +9,6 @@ import "../Interfaces/IRETHPriceFeed.sol";
 // import "forge-std/console2.sol";
 
 contract RETHPriceFeed is CompositePriceFeed, IRETHPriceFeed {
-    event REthEthOracleAddressUpdated(address _oldAddress, address _newAddress);
 
     constructor(
         address _ethUsdOracleAddress,
@@ -92,7 +91,7 @@ contract RETHPriceFeed is CompositePriceFeed, IRETHPriceFeed {
         rEthEthOracle.aggregator = AggregatorV3Interface(_newOracleAddress);
         rEthEthOracle.decimals = rEthEthOracle.aggregator.decimals();
 
-        emit REthEthOracleAddressUpdated(oldAddress, _newOracleAddress);
+        emit OracleAddressUpdated("rEthEth", oldAddress, _newOracleAddress);
     }
 
     function _getCanonicalRate() internal view override returns (uint256, bool) {

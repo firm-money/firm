@@ -13,8 +13,6 @@ contract WSTETHPriceFeed is CompositePriceFeed, IWSTETHPriceFeed {
 
     uint256 public constant STETH_USD_DEVIATION_THRESHOLD = 1e16; // 1%
 
-    event StEthUsdOracleAddressUpdated(address _oldAddress, address _newAddress);
-
     constructor(
         address _ethUsdOracleAddress,
         address _stEthUsdOracleAddress,
@@ -83,7 +81,7 @@ contract WSTETHPriceFeed is CompositePriceFeed, IWSTETHPriceFeed {
         stEthUsdOracle.decimals = stEthUsdOracle.aggregator.decimals();
         assert(stEthUsdOracle.decimals == 8);
 
-        emit StEthUsdOracleAddressUpdated(oldAddress, _newOracleAddress);
+        emit OracleAddressUpdated("stEthUsd", oldAddress, _newOracleAddress);
     }
 
     function _getCanonicalRate() internal view override returns (uint256, bool) {
