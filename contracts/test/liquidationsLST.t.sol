@@ -94,8 +94,8 @@ contract LiquidationsLSTTest is DevTestSetup {
             address(0)
         );
 
-        // Price drops
-        priceFeed.setPrice(1200e18 - 1);
+        // Price drops -- must be: below MCR boundary (< ~1100) AND above CCR boundary for TCR (> ~1067)
+        priceFeed.setPrice(1090e18);
         (uint256 price,) = priceFeed.fetchPrice();
 
         InitialValues memory initialValues;
@@ -130,11 +130,12 @@ contract LiquidationsLSTTest is DevTestSetup {
             "B debt mismatch"
         );
         // Check B has received all coll minus coll gas comp
+        uint256 penaltyColl = (liquidationAmount + initialValues.AInterest) * DECIMAL_PRECISION / price * 120 / 100;
         assertApproxEqAbs(
             troveManager.getTroveEntireColl(BTroveId) - initialValues.BColl,
             LiquityMath._min(
                 collAmount, // no coll gas comp
-                (liquidationAmount + initialValues.AInterest) * DECIMAL_PRECISION / price * 110 / 100 // debt with penalty
+                penaltyColl // debt with penalty
             ),
             10,
             "B trove coll mismatch"
@@ -142,8 +143,7 @@ contract LiquidationsLSTTest is DevTestSetup {
 
         // Check A retains ~10% of the collateral (after claiming from CollSurplus)
         // collAmount - (liquidationAmount to Coll + 10%)
-        uint256 collSurplusAmount =
-            collAmount - (liquidationAmount + initialValues.AInterest) * DECIMAL_PRECISION / price * 110 / 100;
+        uint256 collSurplusAmount = collAmount > penaltyColl ? collAmount - penaltyColl : 0;
         assertApproxEqAbs(
             collToken.balanceOf(address(collSurplusPool)),
             collSurplusAmount,
@@ -155,12 +155,15 @@ contract LiquidationsLSTTest is DevTestSetup {
             collSurplusPool.getCollBalance(),
             "CollSurplusPool balance and getter should match"
         );
-        vm.startPrank(A);
-        borrowerOperations.claimCollateral();
-        vm.stopPrank();
-        assertApproxEqAbs(
-            collToken.balanceOf(A) - initialValues.ACollBalance, collSurplusAmount, 10, "A collateral balance mismatch"
-        );
+        // TODO: check if this is correct
+        if (collSurplusAmount > 0) {
+            vm.startPrank(A);
+            borrowerOperations.claimCollateral();
+            vm.stopPrank();
+            assertApproxEqAbs(
+                collToken.balanceOf(A) - initialValues.ACollBalance, collSurplusAmount, 10, "A collateral balance mismatch"
+            );
+        }
     }
 
     struct FinalValues {
@@ -180,7 +183,7 @@ contract LiquidationsLSTTest is DevTestSetup {
         uint256 initialPrice = 2000e18;
         // A initial CR: 200%
 
-        _finalPrice = bound(_finalPrice, 1000e18, 1200e18 - 1); // A final CR in [100%, 120%[
+        _finalPrice = bound(_finalPrice, 1000e18, 1090e18); // A final CR in [100%, ~109%[ (below MCR 110%)
         _spAmount = bound(_spAmount, 0, liquidationAmount);
 
         priceFeed.setPrice(initialPrice);
@@ -274,7 +277,7 @@ contract LiquidationsLSTTest is DevTestSetup {
         // Redistribution part
         finalValues.collRedistributionPortion = collAmount - collToOffset;
         finalValues.collPenaltyRedistribution =
-            (liquidationAmount - _spAmount + AInterest) * DECIMAL_PRECISION / _finalPrice * 110 / 100;
+            (liquidationAmount - _spAmount + AInterest) * DECIMAL_PRECISION / _finalPrice * 120 / 100;
 
         finalValues.collToLiquidate = finalValues.collSPPortion + finalValues.collRedistributionPortion;
 

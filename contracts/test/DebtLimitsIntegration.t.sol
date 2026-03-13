@@ -11,6 +11,7 @@ import "./TestContracts/DevTestSetup.sol";
 contract DebtLimitsIntegrationTest is DevTestSetup {
 
     function setUp() public override {
+        DEFAULT_DEBT_LIMIT = 100_000_000e18;
         super.setUp();
     }
 
@@ -40,6 +41,7 @@ contract DebtLimitsIntegrationTest is DevTestSetup {
 contract DebtLimitGovernanceIntegrationTest is DevTestSetup {
 
     function setUp() public override {
+        DEFAULT_DEBT_LIMIT = 100_000_000e18;
         super.setUp();
     }
 
