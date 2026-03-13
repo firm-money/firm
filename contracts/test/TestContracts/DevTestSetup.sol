@@ -5,6 +5,8 @@ import "./BaseTest.sol";
 import {TestDeployer} from "./Deployment.t.sol";
 
 contract DevTestSetup is BaseTest {
+    uint256 internal DEFAULT_DEBT_LIMIT = type(uint256).max;
+
     function giveAndApproveColl(address _account, uint256 _amount) public {
         return giveAndApproveCollateral(collToken, _account, _amount, address(borrowerOperations));
     }
@@ -50,7 +52,7 @@ contract DevTestSetup is BaseTest {
         TestDeployer deployer = new TestDeployer();
         TestDeployer.LiquityContractsDev memory contracts;
         TestDeployer.Zappers memory zappers;
-        (contracts, collateralRegistry, boldToken, hintHelpers,, WETH, zappers) = deployer.deployAndConnectContracts();
+        (contracts, collateralRegistry, boldToken, hintHelpers,, WETH, zappers) = deployer.deployAndConnectContracts(DEFAULT_DEBT_LIMIT);
         addressesRegistry = contracts.addressesRegistry;
         collToken = contracts.collToken;
         activePool = contracts.activePool;
