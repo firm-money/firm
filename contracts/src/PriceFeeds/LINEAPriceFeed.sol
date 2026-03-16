@@ -16,9 +16,9 @@ contract LINEAPriceFeed is MainnetPriceFeedBase {
     constructor(
         address _lineaUsdOracleAddress,
         uint256 _lineaUsdStalenessThreshold,
-        address _borrowerOperationsAddress
-    )
-        MainnetPriceFeedBase(_lineaUsdOracleAddress, _lineaUsdStalenessThreshold, _borrowerOperationsAddress)
+        address _borrowerOperationsAddress,
+        address _governor
+    ) MainnetPriceFeedBase(_lineaUsdOracleAddress, _lineaUsdStalenessThreshold, _borrowerOperationsAddress, _governor)
     {
         _fetchPricePrimary();
 

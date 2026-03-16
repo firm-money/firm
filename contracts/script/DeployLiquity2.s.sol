@@ -388,7 +388,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SETH,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SETH,
-            DEBT_LIMIT: DEBT_LIMIT_WSTETH
+            DEBT_LIMIT: DEBT_LIMIT_WSTETH,
             BRANCH_COLL_GAS_COMPENSATION_CAP: STETH_COLL_GAS_COMPENSATION_CAP
         });
 
@@ -403,7 +403,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SNT,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SNT,
-            DEBT_LIMIT: DEBT_LIMIT_SNT
+            DEBT_LIMIT: DEBT_LIMIT_SNT,
             BRANCH_COLL_GAS_COMPENSATION_CAP: SNT_COLL_GAS_COMPENSATION_CAP
         });
 
@@ -415,7 +415,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_LINEA,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_LINEA,
-            DEBT_LIMIT: DEBT_LIMIT_LINEA
+            DEBT_LIMIT: DEBT_LIMIT_LINEA,
             BRANCH_COLL_GAS_COMPENSATION_CAP: LINEA_COLL_GAS_COMPENSATION_CAP
         });
 
@@ -427,7 +427,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             BCR: BCR_ALL,
             LIQUIDATION_PENALTY_SP: LIQUIDATION_PENALTY_SP_SGUSD,
             LIQUIDATION_PENALTY_REDISTRIBUTION: LIQUIDATION_PENALTY_REDISTRIBUTION_SGUSD,
-            DEBT_LIMIT: DEBT_LIMIT_SGUSD
+            DEBT_LIMIT: DEBT_LIMIT_SGUSD,
             BRANCH_COLL_GAS_COMPENSATION_CAP: SGUSD_COLL_GAS_COMPENSATION_CAP
         });
 
@@ -720,7 +720,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                 r.usdcCurvePool,
                 vars.addressesRegistries[vars.i],
                 address(vars.troveManagers[vars.i]),
-                troveManagerParamsArray[vars.i].COLL_GAS_COMPENSATION_CAP,
+                troveManagerParamsArray[vars.i].BRANCH_COLL_GAS_COMPENSATION_CAP,
                 r.hintHelpers,
                 r.multiTroveGetter,
                 computeGovernanceAddress(_deployGovernanceParams)
@@ -775,7 +775,7 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             keccak256(
                 abi.encodePacked(
                     type(TroveManager).creationCode,
-                    abi.encode(address(addressesRegistry), _troveManagerParams.COLL_GAS_COMPENSATION_CAP)
+                    abi.encode(address(addressesRegistry), _troveManagerParams.BRANCH_COLL_GAS_COMPENSATION_CAP)
                 )
             )
         );
@@ -835,7 +835,9 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             SALT, keccak256(getBytecode(type(SortedTroves).creationCode, address(contracts.addressesRegistry)))
         );
 
-        contracts.priceFeed = _deployPriceFeed(address(_collToken), addresses.borrowerOperations);
+        contracts.priceFeed = _deployPriceFeed(
+            address(_collToken), addresses.borrowerOperations, _collateralRegistry.governor()
+        );
 
         IAddressesRegistry.AddressVars memory addressVars = IAddressesRegistry.AddressVars({
             collToken: _collToken,
@@ -892,35 +894,44 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             _deployZappers(contracts.addressesRegistry, contracts.collToken, _boldToken, _usdcCurvePool);
     }
 
-    function _deployPriceFeed(address _collTokenAddress, address _borroweOperationsAddress)
-        internal
-        returns (IPriceFeed)
-    {
+    function _deployPriceFeed(
+        address _collTokenAddress,
+        address _borroweOperationsAddress,
+        address _governor
+    ) internal returns (IPriceFeed) {
         if (block.chainid == 1 && !useTestnetPriceFeeds) {
             // mainnet
             // ETH
             if (_collTokenAddress == address(WETH)) {
-                return new WETHPriceFeed(ETH_ORACLE_ADDRESS, ETH_USD_STALENESS_THRESHOLD, _borroweOperationsAddress);
-            } else if (_collTokenAddress == WSTETH_ADDRESS) {
-                // wstETH
+                return new WETHPriceFeed(
+                    ETH_ORACLE_ADDRESS,
+                    ETH_USD_STALENESS_THRESHOLD,
+                    _borroweOperationsAddress,
+                    _governor
+                );
+            }
+            // wstETH
+            else if (_collTokenAddress == WSTETH_ADDRESS) {
                 return new WSTETHPriceFeed(
                     ETH_ORACLE_ADDRESS,
                     STETH_ORACLE_ADDRESS,
                     WSTETH_ADDRESS,
                     ETH_USD_STALENESS_THRESHOLD,
                     STETH_USD_STALENESS_THRESHOLD,
-                    _borroweOperationsAddress
+                    _borroweOperationsAddress,
+                    _governor
                 );
             }
             // RETH
-            } else if (_collTokenAddress == RETH_ADDRESS) {
+            else if (_collTokenAddress == RETH_ADDRESS) {
                 return new RETHPriceFeed(
                     ETH_ORACLE_ADDRESS,
                     RETH_ORACLE_ADDRESS,
                     RETH_ADDRESS,
                     ETH_USD_STALENESS_THRESHOLD,
                     RETH_ETH_STALENESS_THRESHOLD,
-                    _borroweOperationsAddress
+                    _borroweOperationsAddress,
+                    _governor
                 );
             }
             // SNT
@@ -928,7 +939,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                 return new SNTPriceFeed(
                     SNT_ORACLE_ADDRESS,
                     SNT_USD_STALENESS_THRESHOLD,
-                    _borroweOperationsAddress
+                    _borroweOperationsAddress,
+                    _governor
                 );
             }
             // LINEA
@@ -936,7 +948,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                 return new LINEAPriceFeed(
                     LINEA_ORACLE_ADDRESS,
                     LINEA_USD_STALENESS_THRESHOLD,
-                    _borroweOperationsAddress
+                    _borroweOperationsAddress,
+                    _governor
                 );
             }
             // sGUSD
@@ -944,7 +957,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             return new SGUSDPriceFeed(
                 SGUSD_ORACLE_ADDRESS,
                 SGUSD_USD_STALENESS_THRESHOLD,
-                _borroweOperationsAddress
+                _borroweOperationsAddress,
+                _governor
             );
         }
 

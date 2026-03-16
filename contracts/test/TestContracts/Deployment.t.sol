@@ -660,7 +660,9 @@ contract TestDeployer is MetadataDeployment {
         );
 
         contracts.priceFeed =
-            _deployPriceFeed(_params.branch, _externalAddresses, _oracleParams, addresses.borrowerOperations);
+            _deployPriceFeed(
+                _params.branch, _externalAddresses, _oracleParams, addresses.borrowerOperations, _params.collateralRegistry.governor()
+            );
 
         // Deploy contracts
         IAddressesRegistry.AddressVars memory addressVars = IAddressesRegistry.AddressVars({
@@ -731,14 +733,18 @@ contract TestDeployer is MetadataDeployment {
         uint256 _branch,
         ExternalAddresses memory _externalAddresses,
         OracleParams memory _oracleParams,
-        address _borrowerOperationsAddress
+        address _borrowerOperationsAddress,
+        address _governor
     ) internal returns (IPriceFeed) {
         //assert(_branch < vars.numCollaterals);
         // Price feeds
         // ETH
         if (_branch == 0) {
             return new WETHPriceFeed(
-                _externalAddresses.ETHOracle, _oracleParams.ethUsdStalenessThreshold, _borrowerOperationsAddress
+                _externalAddresses.ETHOracle,
+                _oracleParams.ethUsdStalenessThreshold,
+                _borrowerOperationsAddress,
+                _governor
             );
         } else if (_branch == 1) {
             // RETH
@@ -748,7 +754,8 @@ contract TestDeployer is MetadataDeployment {
                 _externalAddresses.RETHToken,
                 _oracleParams.ethUsdStalenessThreshold,
                 _oracleParams.rEthEthStalenessThreshold,
-                _borrowerOperationsAddress
+                _borrowerOperationsAddress,
+                _governor
             );
         }
 
@@ -759,7 +766,8 @@ contract TestDeployer is MetadataDeployment {
             _externalAddresses.WSTETHToken,
             _oracleParams.ethUsdStalenessThreshold,
             _oracleParams.stEthUsdStalenessThreshold,
-            _borrowerOperationsAddress
+            _borrowerOperationsAddress,
+            _governor
         );
     }
 
