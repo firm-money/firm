@@ -835,7 +835,9 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             SALT, keccak256(getBytecode(type(SortedTroves).creationCode, address(contracts.addressesRegistry)))
         );
 
-        contracts.priceFeed = _deployPriceFeed(address(_collToken), addresses.borrowerOperations);
+        contracts.priceFeed = _deployPriceFeed(
+            address(_collToken), addresses.borrowerOperations, _collateralRegistry.governor()
+        );
 
         IAddressesRegistry.AddressVars memory addressVars = IAddressesRegistry.AddressVars({
             collToken: _collToken,
@@ -892,15 +894,21 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             _deployZappers(contracts.addressesRegistry, contracts.collToken, _boldToken, _usdcCurvePool);
     }
 
-    function _deployPriceFeed(address _collTokenAddress, address _borroweOperationsAddress)
-        internal
-        returns (IPriceFeed)
-    {
+    function _deployPriceFeed(
+        address _collTokenAddress,
+        address _borroweOperationsAddress,
+        address _governor
+    ) internal returns (IPriceFeed) {
         if (block.chainid == 1 && !useTestnetPriceFeeds) {
             // mainnet
             // ETH
             if (_collTokenAddress == address(WETH)) {
-                return new WETHPriceFeed(ETH_ORACLE_ADDRESS, ETH_USD_STALENESS_THRESHOLD, _borroweOperationsAddress);
+                return new WETHPriceFeed(
+                    ETH_ORACLE_ADDRESS,
+                    ETH_USD_STALENESS_THRESHOLD,
+                    _borroweOperationsAddress,
+                    _governor
+                );
             }
             // wstETH
             else if (_collTokenAddress == WSTETH_ADDRESS) {
@@ -910,7 +918,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                     WSTETH_ADDRESS,
                     ETH_USD_STALENESS_THRESHOLD,
                     STETH_USD_STALENESS_THRESHOLD,
-                    _borroweOperationsAddress
+                    _borroweOperationsAddress,
+                    _governor
                 );
             }
             // RETH
@@ -921,7 +930,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                     RETH_ADDRESS,
                     ETH_USD_STALENESS_THRESHOLD,
                     RETH_ETH_STALENESS_THRESHOLD,
-                    _borroweOperationsAddress
+                    _borroweOperationsAddress,
+                    _governor
                 );
             }
             // SNT
@@ -929,7 +939,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                 return new SNTPriceFeed(
                     SNT_ORACLE_ADDRESS,
                     SNT_USD_STALENESS_THRESHOLD,
-                    _borroweOperationsAddress
+                    _borroweOperationsAddress,
+                    _governor
                 );
             }
             // LINEA
@@ -937,7 +948,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
                 return new LINEAPriceFeed(
                     LINEA_ORACLE_ADDRESS,
                     LINEA_USD_STALENESS_THRESHOLD,
-                    _borroweOperationsAddress
+                    _borroweOperationsAddress,
+                    _governor
                 );
             }
             // sGUSD
@@ -945,7 +957,8 @@ contract DeployLiquity2Script is DeployGovernance, UniPriceConverter, StdCheats,
             return new SGUSDPriceFeed(
                 SGUSD_ORACLE_ADDRESS,
                 SGUSD_USD_STALENESS_THRESHOLD,
-                _borroweOperationsAddress
+                _borroweOperationsAddress,
+                _governor
             );
         }
 
