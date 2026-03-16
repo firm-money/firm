@@ -14,6 +14,13 @@ interface IBoldToken is IERC20Metadata, IERC20Permit, IERC5267 {
         address _activePoolAddress
     ) external;
 
+    function setBranchAddressesViaCollateralRegistry(
+        address _troveManagerAddress,
+        address _stabilityPoolAddress,
+        address _borrowerOperationsAddress,
+        address _activePoolAddress
+    ) external;
+
     function setCollateralRegistry(address _collateralRegistryAddress) external;
 
     function mint(address _account, uint256 _amount) external;

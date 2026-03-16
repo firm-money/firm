@@ -6,6 +6,7 @@ import "openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.s
 
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IBoldToken.sol";
+import "./Interfaces/IAddressesRegistry.sol";
 import "./Dependencies/Constants.sol";
 import "./Dependencies/LiquityMath.sol";
 
@@ -329,10 +330,20 @@ contract CollateralRegistry is ICollateralRegistry {
 
     // --- Add branch functions ---
 
-    function addCollateral(IERC20Metadata _token, ITroveManager _troveManager) external onlyGovernor {
+    function addCollateral(IAddressesRegistry _addressesRegistry) external onlyGovernor {
+        IERC20Metadata _token = _addressesRegistry.collToken();
+        ITroveManager _troveManager = _addressesRegistry.troveManager();
+        address _stabilityPool = address(_addressesRegistry.stabilityPool());
+        address _borrowerOperations = address(_addressesRegistry.borrowerOperations());
+        address _activePool = address(_addressesRegistry.activePool());
+
         require(totalCollaterals < 10, "CollateralRegistry: Maximum number of branches reached");
         require(address(_token) != address(0), "CollateralRegistry: Token cannot be the zero address");
+        require(address(_token) != address(boldToken), "CollateralRegistry: Token cannot be the bold token");
         require(address(_troveManager) != address(0), "CollateralRegistry: Trove manager cannot be the zero address");
+        require(_stabilityPool != address(0), "CollateralRegistry: Stability pool cannot be the zero address");
+        require(_borrowerOperations != address(0), "CollateralRegistry: Borrower operations cannot be the zero address");
+        require(_activePool != address(0), "CollateralRegistry: Active pool cannot be the zero address");
 
         uint256 collIndex = totalCollaterals;
 
@@ -367,6 +378,13 @@ contract CollateralRegistry is ICollateralRegistry {
             token0 = _token;
             troveManager0 = _troveManager;
         }
+
+        boldToken.setBranchAddressesViaCollateralRegistry(
+            address(_troveManager), 
+            _stabilityPool, 
+            _borrowerOperations, 
+            _activePool
+        );
 
         totalCollaterals = collIndex + 1;
         emit CollateralAdded(collIndex, _token, _troveManager);
