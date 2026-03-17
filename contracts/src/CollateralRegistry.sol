@@ -14,29 +14,29 @@ import "./Interfaces/ICollateralRegistry.sol";
 
 contract CollateralRegistry is ICollateralRegistry {
     // See: https://github.com/ethereum/solidity/issues/12587
-    uint256 public immutable totalCollaterals;
+    uint256 public totalCollaterals;
 
-    IERC20Metadata internal immutable token0;
-    IERC20Metadata internal immutable token1;
-    IERC20Metadata internal immutable token2;
-    IERC20Metadata internal immutable token3;
-    IERC20Metadata internal immutable token4;
-    IERC20Metadata internal immutable token5;
-    IERC20Metadata internal immutable token6;
-    IERC20Metadata internal immutable token7;
-    IERC20Metadata internal immutable token8;
-    IERC20Metadata internal immutable token9;
+    IERC20Metadata internal token0;
+    IERC20Metadata internal token1;
+    IERC20Metadata internal token2;
+    IERC20Metadata internal token3;
+    IERC20Metadata internal token4;
+    IERC20Metadata internal token5;
+    IERC20Metadata internal token6;
+    IERC20Metadata internal token7;
+    IERC20Metadata internal token8;
+    IERC20Metadata internal token9;
 
-    ITroveManager internal immutable troveManager0;
-    ITroveManager internal immutable troveManager1;
-    ITroveManager internal immutable troveManager2;
-    ITroveManager internal immutable troveManager3;
-    ITroveManager internal immutable troveManager4;
-    ITroveManager internal immutable troveManager5;
-    ITroveManager internal immutable troveManager6;
-    ITroveManager internal immutable troveManager7;
-    ITroveManager internal immutable troveManager8;
-    ITroveManager internal immutable troveManager9;
+    ITroveManager internal troveManager0;
+    ITroveManager internal troveManager1;
+    ITroveManager internal troveManager2;
+    ITroveManager internal troveManager3;
+    ITroveManager internal troveManager4;
+    ITroveManager internal troveManager5;
+    ITroveManager internal troveManager6;
+    ITroveManager internal troveManager7;
+    ITroveManager internal troveManager8;
+    ITroveManager internal troveManager9;
 
     IBoldToken public immutable boldToken;
 
@@ -51,6 +51,7 @@ contract CollateralRegistry is ICollateralRegistry {
     event BaseRateUpdated(uint256 _baseRate);
     event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
     event DebtLimitUpdated(uint256 indexed _index, uint256 _oldLimit, uint256 _newLimit);
+    event CollateralAdded(uint256 indexed _index, IERC20Metadata _token, ITroveManager _troveManager);
 
     modifier onlyGovernor() {
         require(msg.sender == governor, "CollateralRegistry: Only governor can call");
@@ -385,7 +386,8 @@ contract CollateralRegistry is ICollateralRegistry {
             _activePool
         );
 
-        totalCollaterals = collIndex + 1;
+        totalCollaterals++;
+
         emit CollateralAdded(collIndex, _token, _troveManager);
     }
 
