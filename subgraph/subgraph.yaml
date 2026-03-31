@@ -64,6 +64,28 @@ dataSources:
       file: ./src/Governance.mapping.ts
     network: mainnet
 templates:
+  - name: CollateralRegistry
+    kind: ethereum/contract
+    network: mainnet
+    source:
+      abi: CollateralRegistry
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      file: ./src/CollateralRegistry.mapping.ts
+      entities:
+        - Collateral
+        - CollateralAddresses
+        - CollateralAdded
+      abis:
+        - name: CollateralRegistry
+          file: ../contracts/out/CollateralRegistry.sol/CollateralRegistry.json
+      eventHandlers:
+        - event: CollateralAdded(indexed uint256,address,address)
+          handler: handleCollateralAdded
+        - event: DebtLimitUpdated(indexed uint256,uint256,uint256)
+          handler: handleDebtLimitUpdated
   - name: TroveManager
     kind: ethereum/contract
     network: mainnet

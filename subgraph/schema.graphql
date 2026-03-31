@@ -18,6 +18,13 @@ type CollateralAddresses @entity(immutable: false) {
   collSurplusPool: Bytes
 }
 
+type CollateralAdded @entity(immutable: true) {
+  id: ID! # "collIndex", e.g. "0"
+  collateral: Collateral!
+  token: Bytes!
+  troveManager: Bytes!
+}
+
 type InterestRateBracket @entity(immutable: false) {
   id: ID! # "collIndex:rateFloored", e.g. "0:44000000000000000"
   collateral: Collateral!
