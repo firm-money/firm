@@ -45,3 +45,4 @@ testMatrix.json
 
 # E2E broadcast logs
 /broadcast-e2e
+/broadcast/**/374
