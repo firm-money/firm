@@ -229,8 +229,23 @@ contract TestDeployer is MetadataDeployment {
             Zappers memory zappers
         )
     {
+        return deployAndConnectContracts(type(uint256).max);
+    }
+
+    function deployAndConnectContracts(uint256 _debtLimit)
+        public
+        returns (
+            LiquityContractsDev memory contracts,
+            ICollateralRegistry collateralRegistry,
+            IBoldToken boldToken,
+            HintHelpers hintHelpers,
+            MultiTroveGetter multiTroveGetter,
+            IWETH WETH, // for gas compensation
+            Zappers memory zappers
+        )
+    {
         return deployAndConnectContracts(
-            TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16, 100_000_000e18, 0.125 ether)
+            TroveManagerParams(150e16, 110e16, 10e16, 110e16, 5e16, 10e16, _debtLimit, 0.125 ether)
         );
     }
 

@@ -522,7 +522,7 @@ contract TroveEventsTest is EventsTest, ITroveEvents {
 
             l.ethGasCompensation = ETH_GAS_COMPENSATION;
             uint256 collToOffset = liquidatedColl[i] * l.debtOffsetBySP / liquidatedDebt[i];
-            collRemaining -= l.collGasCompensation = collToOffset / COLL_GAS_COMPENSATION_DIVISOR;
+            collRemaining -= l.collGasCompensation = troveManager.getCollGasCompensation(collToOffset);
 
             collRemaining -= l.collSentToSP = Math.min(
                 collToOffset - l.collGasCompensation,

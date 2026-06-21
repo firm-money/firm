@@ -2370,12 +2370,12 @@ contract SPTest is DevTestSetup {
         );
 
         uint256 collToOffset = vars.collBBefore * liqDebtOffset / vars.debtBBefore;
-        // For < 400 units of LST collateral, collGasComp = 0.0375 WETH + 0.5% * coll.
+        // For < 400 units of LST collateral, collGasComp = 0.5% * coll.
         // We only need the Trove's component here.
         vars.collGasComp = collToOffset / 200;
 
         // Check C's total WETH balance increased by the total gas comp
-        assertEq(collToken.balanceOf(C), vars.collCBefore + vars.collGasComp + 375e14, "Incorrect coll increase C");
+        assertEq(collToken.balanceOf(C), vars.collCBefore + vars.collGasComp, "Incorrect coll increase C");
 
         // Check SP Coll has increased.  Expect no coll surplus for Trove owner, given massive price decrease
         vars.spCollBalAfter = stabilityPool.getCollBalance();
@@ -2591,7 +2591,7 @@ contract SPTest is DevTestSetup {
         vars.collGasComp = collToOffset / 200;
 
         // Check C's total WETH balance increased by the total gas comp
-        assertEq(collToken.balanceOf(C), vars.collCBefore + vars.collGasComp + 375e14);
+        assertEq(collToken.balanceOf(C), vars.collCBefore + vars.collGasComp);
 
         // Check SP Coll has increased.  Expect no coll surplus for Trove owner, given massive price decrease
         vars.spCollBalAfter = stabilityPool.getCollBalance();
